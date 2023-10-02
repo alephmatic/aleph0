@@ -43,12 +43,6 @@ export function ProfileForm() {
 
   async function onSubmit(values: FormSchema) {
     try {
-      // TODO remove this toast when API works
-      toast({
-        title: "Updating...",
-        description: JSON.stringify(values, null, 2),
-      })
-
       const res = await postRequest<any, FormSchema>(
         "/api/user/settings",
         values
@@ -56,7 +50,7 @@ export function ProfileForm() {
 
       toast({
         title: "Profile updated",
-        description: res,
+        description: `${JSON.stringify(res, null, 2)}`,
       })
     } catch (error: any) {
       toast({
