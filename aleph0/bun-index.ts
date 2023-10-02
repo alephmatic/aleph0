@@ -10,14 +10,14 @@ async function main() {
   const routeFile = Bun.file("./snippets/form-api/route.ts.txt");
   const routeContents = await routeFile.text();
   if (!fs.existsSync("../examples/next/app/api/article"))
-    fs.mkdirSync("../examples/next/app/api/article");
+    fs.mkdirSync("../examples/next/app/api/article", { recursive: true });
   await Bun.write("../examples/next/app/api/article/route.ts", routeContents);
 
   // form
   const formFile = Bun.file("./snippets/form-api/form.tsx.txt");
   const formContents = await formFile.text();
   if (!fs.existsSync("../examples/next/app"))
-    fs.mkdirSync("../examples/next/app");
+    fs.mkdirSync("../examples/next/app", { recursive: true });
   await Bun.write("../examples/next/app/ArticleForm.tsx", formContents);
 
   console.log(`✅ Added form with API route`);
