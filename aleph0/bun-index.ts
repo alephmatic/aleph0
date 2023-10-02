@@ -20,6 +20,26 @@ async function main() {
     fs.mkdirSync("../examples/next/app", { recursive: true });
   await Bun.write("../examples/next/app/ArticleForm.tsx", formContents);
 
+  // toaster - replace file example
+  const existLayoutFile = Bun.file("../examples/next/app/layout.tsx");
+  const existingLayoutContents = await existLayoutFile.text();
+
+  const layoutFile = Bun.file("./snippets/toaster/toaster.tsx.txt");
+  const layoutContents = await layoutFile.text();
+
+  const updatedLayoutContents = existingLayoutContents
+    .replace(
+      "<body className={inter.className}>{children}</body>",
+      layoutContents
+    )
+    .replace(
+      `import { Inter } from 'next/font/google'`,
+      `import { Inter } from 'next/font/google'
+import { Toaster } from '@/components/ui/toaster'`
+    );
+
+  await Bun.write("../examples/next/app/layout.tsx", updatedLayoutContents);
+
   console.log(`✅ Added form with API route`);
 }
 
