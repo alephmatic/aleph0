@@ -18,6 +18,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useToast } from "@/components/ui/use-toast"
+import { postRequest } from "@/lib/api"
 
 const formSchema = z.object({
   username: z.string().min(2, {
@@ -26,11 +27,12 @@ const formSchema = z.object({
   email: z.string().email(),
   city: z.enum(["London", "New York", "Tokyo"]),
 })
+type FormSchema = z.infer<typeof formSchema>
 
 export function ProfileForm() {
   const { toast } = useToast()
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       username: "",
@@ -39,11 +41,30 @@ export function ProfileForm() {
     },
   })
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    toast({
-      title: "Profile updated",
-      description: JSON.stringify(values, null, 2),
-    })
+  async function onSubmit(values: FormSchema) {
+    try {
+      // TODO remove this toast when API works
+      toast({
+        title: "Updating...",
+        description: JSON.stringify(values, null, 2),
+      })
+
+      const res = await postRequest<any, FormSchema>(
+        "/api/user/settings",
+        values
+      );
+
+      toast({
+        title: "Profile updated",
+        description: res,
+      })
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: `There was an error: ${error.message}`,
+      })
+    }
   }
 
   return (
