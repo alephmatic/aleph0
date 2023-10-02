@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useToast } from "@/components/ui/use-toast"
 
 const formSchema = z.object({
   username: z.string().min(2, {
@@ -27,6 +28,8 @@ const formSchema = z.object({
 })
 
 export function ProfileForm() {
+  const { toast } = useToast()
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -37,7 +40,10 @@ export function ProfileForm() {
   })
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    alert(JSON.stringify(values, null, 2))
+    toast({
+      title: "Profile updated",
+      description: JSON.stringify(values, null, 2),
+    })
   }
 
   return (
