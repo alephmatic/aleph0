@@ -8,7 +8,7 @@ Given the following snippets,
 in the following format per snippet: '{name} - {description} (path: {path})\n'
 ${snippetsText}
 
-Output should be a valid json from abovesnippets.
+Output should be a valid json from snippets above.
 return the most relevant snippet above to achieve: "${userText}":\n`;
 
 export const createChangesArray = async (
