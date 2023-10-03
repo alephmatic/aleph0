@@ -1,0 +1,9 @@
+{
+  "name": "Form API",
+  "description": "A generic form in JSX including the relevant Next.js route.ts handler for submission.",
+  "path": "form-api",
+  "knowledgeMapping": {
+    "form.tsx": "page.tsx",
+    "route.ts": "route.ts"
+  }
+}

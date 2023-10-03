@@ -1,0 +1,8 @@
+{
+  "name": "Toaster",
+  "description": "A toast component example - A short message that is displayed temporarily.",
+  "path": "toaster",
+  "knowledgeMapping": {
+    "toasher.tsx": "page.tsx"
+  }
+}
