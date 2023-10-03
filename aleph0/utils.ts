@@ -68,7 +68,12 @@ export async function getProjectStructure(
   const structure = await Promise.all(
     contents.map(async (entry) => {
       const entryPath = path.join(projectRoot, entry.name);
-      if (entry.isDirectory() && entry.name !== "node_modules") {
+      // TODO use .gitignore here?
+      if (entry.name === "node_modules" || entry.name === ".next") {
+        console.log('Skipping "node_modules" or ".next" folder');
+        return "";
+      }
+      if (entry.isDirectory()) {
         const subStructure = await getProjectStructure(
           entryPath,
           `${indent}  `
@@ -79,5 +84,5 @@ export async function getProjectStructure(
       }
     })
   );
-  return structure.join("\n");
+  return structure.filter(Boolean).join("\n");
 }

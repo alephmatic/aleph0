@@ -1,7 +1,13 @@
 import { Command } from "commander";
+import { z } from "zod";
 import { getProjectStructure, loadSnippets } from "./utils";
-import { createChangesArray, findRelevantSnippets } from "./prompts";
+import {
+  createChangesArray,
+  findRelevantSnippets,
+  generateFile,
+} from "./prompts";
 import { ai } from "./openai";
+import { createFile, readFile } from "./lib/file";
 
 async function generate(text: string) {
   console.log("Creating:", text);
@@ -17,23 +23,37 @@ async function generate(text: string) {
   // 2. Find the relevant files we are dealing with
   // For each snippet file, find the corresponding file to be created/modified
   // const changes = [{snippet: 'path', sourceFile: 'path'}]
-  const projectSturcutre = await getProjectStructure("../examples/next");
+  const projectStructure = await getProjectStructure("../examples/next");
+
   const changesRaw = await ai(
-    await createChangesArray(relevantSnippet, projectSturcutre, "nextjs13"),
+    await createChangesArray(relevantSnippet, projectStructure, "nextjs13"),
     "Find what files are relevant for these snippets in this project.",
     "gpt-4"
   );
   if (!changesRaw)
     throw new Error(`AI returned a bad changes array: ${relevantSnippet}`);
 
-  const changes = JSON.parse(changesRaw);
+  const changesSchema = z.array(
+    z.object({
+      snippetPath: z.string(),
+      sourcePath: z.string(),
+    })
+  );
+  const changes = changesSchema.parse(JSON.parse(changesRaw));
+
   console.log(changes);
 
   // 3. For each file in the changes array, ask GPT 4 for the new file and create/modify it.
-  // for(const change of changes) {
-  //   if(change.create)
-  //   fs.mkdirSync(<the path to create>, { recursive: true });
-  // }
+  for (const change of changes) {
+    const snippet = readFile(change.snippetPath);
+    const fileContents = await ai(
+      await generateFile(snippet, text),
+      undefined,
+      "gpt-4"
+    );
+    if (!fileContents) throw new Error(`AI returned a bad file`);
+    createFile(change.sourcePath, fileContents);
+  }
 }
 
 const program = new Command();

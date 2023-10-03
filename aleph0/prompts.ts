@@ -48,10 +48,28 @@ export const createChangesArray = async (
   - Valid JSON array, no explanations or descriptions.
   - If the file needs to be created, think about the most apropriate path and file name.
     - Add an attribute {create: true} if so.
-  - snippet and sourcePath have to have the same file name (e.g. snippet="route.ts", then sourcePath must be a file named the same: "route.ts")
+  - snippetPath and sourcePath have to have the same file name (e.g. snippetPath="route.ts", then sourcePath must be a file named the same: "route.ts")
   - Output in the following format example:
-    [{snippet: "snippets/search-handler/route.ts", sourcePath: "app/search/route.ts"]
+    [{snippetPath: "snippets/search-handler/route.ts", sourcePath: "app/search/route.ts"]
 
   JSON result:
   `;
+};
+
+export const generateFile = async (snippet: string, userText: string) => {
+  return `You are an expert Next.js full-stack developer.
+You are following the user instructions to write code:
+###
+${userText}
+###
+
+Only return valid code that can be pasted directly into the project without editing.
+DO NOT ADD ADDITIONAL COMMENTS OR EXPLANATIONS.
+
+This is an example of a valid file from the project. YOU MUST CHANGE THIS TO BE THE ACTUAL FILE FOR OUR USE CASE:
+
+###
+${snippet}
+###
+`;
 };
