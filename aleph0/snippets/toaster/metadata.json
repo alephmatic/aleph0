@@ -1,4 +1,5 @@
 {
   "name": "Toaster",
-  "description": "A toast component example - A short message that is displayed temporarily."
+  "description": "A toast component example - A short message that is displayed temporarily.",
+  "path": "toaster"
 }

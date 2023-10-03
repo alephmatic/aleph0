@@ -1,6 +1,10 @@
 import fs from "fs/promises";
 import path from "path";
 
+/*
+Finds all of the metadata.json files in the snippets directory and returns:
+{name} - {description} (path: {path})\n...
+*/
 export async function loadSnippets() {
   const snippetsDir = "./snippets";
   const snippetDirs = await fs.readdir(snippetsDir, { withFileTypes: true });
@@ -12,11 +16,26 @@ export async function loadSnippets() {
   );
   const metadataObjects = metadataFiles.map((metadata) => JSON.parse(metadata));
   const formattedMetadata = metadataObjects
-    .map((metadata) => `${metadata.name} - ${metadata.description}`)
+    .map(
+      (metadata) =>
+        `${metadata.name} - ${metadata.description} (path: ${metadata.path})`
+    )
     .join("\n");
   return formattedMetadata;
 }
 
+/*
+Returns something akin to:
+ .gitignore
+  package.json
+  public/
+    vercel.svg
+    next.svg
+  app/
+    globals.css
+    favicon.ico
+  ...
+*/
 export async function getProjectStructure(
   projectRoot: string,
   indent = "  "
@@ -38,3 +57,9 @@ export async function getProjectStructure(
   );
   return structure.join("\n");
 }
+
+// export const FUNCTION_CALLS = {
+//   readSnippet: function (snippetPath: string) {
+//     console.log("Reading", snippetPath);
+//   },
+// };
