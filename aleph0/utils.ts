@@ -24,7 +24,7 @@ export async function getSnippetFiles(snippetPath: string) {
   const files = await fs.readdir(snippetsDir);
   const snippetFiles = await Promise.all(
     files
-      .filter((file) => file.endsWith(".txt"))
+      .filter((file) => !file.endsWith(".json"))
       .map(async (file) => {
         const filePath = path.join(snippetsDir, file);
         return filePath;

@@ -1,11 +1,6 @@
-import fs from "node:fs";
 import { Command } from "commander";
 import { getProjectStructure, loadSnippets } from "./utils";
-import {
-  createChangesArray,
-  createFsActions,
-  findRelevantSnippets,
-} from "./prompts";
+import { createChangesArray, findRelevantSnippets } from "./prompts";
 import { ai } from "./openai";
 
 async function generate(text: string) {

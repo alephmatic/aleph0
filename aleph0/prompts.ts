@@ -40,11 +40,12 @@ export const createChangesArray = async (
   ${mappedSnipepts}
 
   Rules:
-  - Valid JSON array.
+  - Valid JSON array, no explanations.
   - If the file needs to be created, think about the most apropriate path and file name.
     - Add an attribute {create: true} if so.
+  - snippet and sourcePath have to have the same file name (e.g. snippet="route.ts", then sourcePath must be a file named the same: "route.ts")
 
-  Create a JSON array in the following format:
-  [{snippet: <snippet path>, sourcePath: <file to modify in the project>}...]
+  Create a JSON array in the following format example:
+  [{snippet: "snippets/search/route.ts", sourcePath: "app/search/route.ts"]
   `;
 };
