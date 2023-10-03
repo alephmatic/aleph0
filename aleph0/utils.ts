@@ -16,3 +16,25 @@ export async function loadSnippets() {
     .join("\n");
   return formattedMetadata;
 }
+
+export async function getProjectStructure(
+  projectRoot: string,
+  indent = "  "
+): Promise<string> {
+  const contents = await fs.readdir(projectRoot, { withFileTypes: true });
+  const structure = await Promise.all(
+    contents.map(async (entry) => {
+      const entryPath = path.join(projectRoot, entry.name);
+      if (entry.isDirectory()) {
+        const subStructure = await getProjectStructure(
+          entryPath,
+          `${indent}  `
+        );
+        return `${indent}${entry.name}/\n${subStructure}`;
+      } else {
+        return `${indent}${entry.name}`;
+      }
+    })
+  );
+  return structure.join("\n");
+}

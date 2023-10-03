@@ -1,8 +1,9 @@
 import fs from "node:fs";
-import { loadSnippets } from "./utils";
+import { getProjectStructure, loadSnippets } from "./utils";
 
 async function main() {
   console.log(await loadSnippets());
+  console.log(await getProjectStructure("../examples/next"));
 
   // example to create an "article" component with an api route
   // in the future the AI will write the file contents
