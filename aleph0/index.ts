@@ -46,7 +46,11 @@ async function generate(text: string) {
   // 3. For each file in the changes array, ask GPT 4 for the new file and create/modify it.
   for (const change of changes) {
     const snippet = readFile(change.snippetPath);
-    const fileContents = await ai(await generateFile(snippet));
+    const fileContents = await ai(
+      await generateFile(snippet, text),
+      undefined,
+      "gpt-4"
+    );
     if (!fileContents) throw new Error(`AI returned a bad file`);
     createFile(change.sourcePath, fileContents);
   }

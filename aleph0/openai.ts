@@ -7,7 +7,7 @@ const openai = new OpenAI({
 export async function ai(
   content: string,
   instructions?: string,
-  model = "gpt-3.5-turbo"
+  model: "gpt-3.5-turbo" | "gpt-4" = "gpt-3.5-turbo"
 ) {
   let messages: OpenAI.Chat.ChatCompletionMessage[] = [
     { role: "user", content: content },

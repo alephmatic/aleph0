@@ -56,8 +56,20 @@ export const createChangesArray = async (
   `;
 };
 
-export const generateFile = async (snippet: string) => {
-  // TODO
-  return snippet;
-  // return `You are an expert Next.js full-stack developer. Generate a file from the following snippet`;
+export const generateFile = async (snippet: string, userText: string) => {
+  return `You are an expert Next.js full-stack developer.
+You are following the user instructions to write code:
+###
+${userText}
+###
+
+Only return valid code that can be pasted directly into the project without editing.
+DO NOT ADD ADDITIONAL COMMENTS OR EXPLANATIONS.
+
+This is an example of a valid file from the project. YOU MUST CHANGE THIS TO BE THE ACTUAL FILE FOR OUR USE CASE:
+
+###
+${snippet}
+###
+`;
 };
