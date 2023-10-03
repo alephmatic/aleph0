@@ -84,5 +84,5 @@ export async function getProjectStructure(
       }
     })
   );
-  return structure.join("\n");
+  return structure.filter(Boolean).join("\n");
 }
