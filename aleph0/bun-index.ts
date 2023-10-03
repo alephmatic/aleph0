@@ -1,22 +1,28 @@
 import fs from "node:fs";
 import { Command } from "commander";
 import { getProjectStructure, loadSnippets } from "./utils";
+import { findRelevantSnippets } from "./prompts";
+import { ai } from "./openai";
 
 async function generate(text: string) {
-  console.log(await loadSnippets());
-  console.log(await getProjectStructure("../examples/next"));
+  const snippets = await loadSnippets();
+  // console.log(snippets);
+  // console.log(await getProjectStructure("../examples/next"));
 
-  console.log("Creating request", text);
+  console.log("Creating:", text);
+
+  // 1. Find the relevant snippet
+  const relevantSnippet = await ai(findRelevantSnippets(text, snippets));
+  console.log("Relevant snippet:", relevantSnippet);
 }
-const program = new Command();
 
+const program = new Command();
 program
   .command("gen <text>")
   .description("Generate nextjs snippet.")
   .action((text) => {
     generate(text);
   });
-
 program.parse(process.argv);
 
 // example to create an "article" component with an api route

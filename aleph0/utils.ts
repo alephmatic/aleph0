@@ -2,8 +2,7 @@ import fs from "fs/promises";
 import path from "path";
 
 /*
-Finds all of the metadata.json files in the snippets directory and returns:
-{name} - {description} (path: {path})\n...
+Finds all of the metadata.json files in the snippets directory returns json array
 */
 export async function loadSnippets() {
   const snippetsDir = "./snippets";
@@ -14,14 +13,10 @@ export async function loadSnippets() {
       .map((dir) => path.join(snippetsDir, dir.name, "metadata.json"))
       .map((metadataPath) => fs.readFile(metadataPath, "utf-8"))
   );
-  const metadataObjects = metadataFiles.map((metadata) => JSON.parse(metadata));
-  const formattedMetadata = metadataObjects
-    .map(
-      (metadata) =>
-        `${metadata.name} - ${metadata.description} (path: ${metadata.path})`
-    )
+  const metadataObjects = metadataFiles
+    .map((metadata) => metadata.replace(/[\n]/g, "").replace(/\s\s/g, ""))
     .join("\n");
-  return formattedMetadata;
+  return metadataObjects;
 }
 
 /*
