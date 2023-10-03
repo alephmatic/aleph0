@@ -1,4 +1,10 @@
-import { getSnippetFiles, getSnippets } from "./utils";
+import {
+  getKnowledge,
+  getSnippetFiles,
+  getSnippets,
+  loadSnippetMetadata,
+} from "./utils";
+import path from "path";
 
 export const findRelevantSnippets = (
   userText: string,
@@ -13,39 +19,43 @@ return the most relevant snippet above to achieve: "${userText}":\n`;
 
 export const createChangesArray = async (
   snippet: string,
-  projectStructure: string
+  projectStructure: string,
+  projectType: string
 ) => {
   const snippetObj = JSON.parse(snippet);
-  const mappedSnipepts = (await getSnippetFiles(snippetObj.path)).join("\n");
+  const snippets: string[] = await getSnippetFiles(snippetObj.path);
+  const snippetsKnowledgeMapping = snippetObj.knowledgeMapping;
+
+  const knowledge = await getKnowledge(projectType);
+
+  // Find knowledge relevant to the files, that might help openai decide what and how to change files
+  const relevantSnippetKnowledge = Object.keys(snippetsKnowledgeMapping)
+    .map((sk) => {
+      return knowledge[snippetsKnowledgeMapping[sk]];
+    })
+    .join("\n");
 
   return `
   You are an expert Next13 fullstack developer.
-  In version 13, Next.js introduced a new App Router built on React Server Components, which supports shared layouts, nested routing, loading states, error handling, and more1
-3
-. The App Router works in a new directory named app, which allows for greater flexibility in terms of project structure3
-. The new App Router structure does not include a pages/ directory, which was used in the previous version2
-. Instead, folders are used to define routes, and each folder in a route represents a route segment. Each route segment is mapped to a corresponding segment in a URL path1
-. Here are the main points about the new App Router structure:
-
-    The App Router works in a new directory named app.
-    Folders are used to define routes.
-    Each folder in a route represents a route segment.
-    Each route segment is mapped to a corresponding segment in a URL path.
-    The new App Router structure does not include a pages/ directory.
+  ${knowledge["general.txt"]}
 
   Assuming the following project structure:
   ${projectStructure}
 
   And the following snippet files:
-  ${mappedSnipepts}
+  ${snippets.join("\n")}
+
+  And the snippet file definitions:
+  ${relevantSnippetKnowledge}
+
+  Return the snippets and relative source files to create/modify.
 
   Rules:
   - Valid JSON array, no explanations.
   - If the file needs to be created, think about the most apropriate path and file name.
     - Add an attribute {create: true} if so.
   - snippet and sourcePath have to have the same file name (e.g. snippet="route.ts", then sourcePath must be a file named the same: "route.ts")
-
-  Create a JSON array in the following format example:
-  [{snippet: "snippets/search/route.ts", sourcePath: "app/search/route.ts"]
+  - Output in the following format example:
+    [{snippet: "snippets/search-handler/route.ts", sourcePath: "app/search/route.ts"]
   `;
 };

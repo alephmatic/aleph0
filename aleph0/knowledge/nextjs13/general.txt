@@ -2,10 +2,11 @@ Next.js is a React framework for building full-stack web applications. You use R
 
 Project Sturcutre
   Top-level folders
-    app	App Router
-    pages	Pages Router (compatability for next js 12)
-    public	Static assets to be served
-    src	Optional application source folder
+    app/	App Router
+    components/ Reusable react components that you can use inside the app directory.
+    pages/	Pages Router (compatability for next js 12)
+    public/	Static assets to be served
+    src/	Optional application source folder
 
   app Routing Conventions
     Routing Files
@@ -23,3 +24,4 @@ Creating Routes
 Next.js uses a file-system based router where folders are used to define routes.
 Each folder represents a route segment that maps to a URL segment. To create a nested route, you can nest folders inside each other.
 A Dynamic Segment can be created by wrapping a folder's name in square brackets: [folderName]. For example, [id] or [slug].
+

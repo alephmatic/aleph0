@@ -33,6 +33,21 @@ export async function getSnippetFiles(snippetPath: string) {
   return snippetFiles;
 }
 
+export async function getKnowledge(projectType: string) {
+  const folderPath = `./knowledge/${projectType}`;
+  const files = await fs.readdir(folderPath);
+  const fileContents = {};
+
+  for (const file of files) {
+    const fileName = file;
+    const filePath = `${folderPath}/${file}`;
+    const content = await fs.readFile(filePath, "utf-8");
+    fileContents[fileName] = content;
+  }
+
+  return fileContents;
+}
+
 /*
 Returns something akin to:
  .gitignore

@@ -19,8 +19,8 @@ async function generate(text: string) {
   // const changes = [{snippet: 'path', sourceFile: 'path'}]
   const projectSturcutre = await getProjectStructure("../examples/next");
   const changesRaw = await ai(
-    await createChangesArray(relevantSnippet, projectSturcutre),
-    "Find what files are relevant for theseS snippets in this project.",
+    await createChangesArray(relevantSnippet, projectSturcutre, "nextjs13"),
+    "Find what files are relevant for these snippets in this project.",
     "gpt-4"
   );
   if (!changesRaw)
