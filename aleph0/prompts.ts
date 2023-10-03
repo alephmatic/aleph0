@@ -45,11 +45,13 @@ export const createChangesArray = async (
   Return the snippets and relative source files to create/modify.
 
   Rules:
-  - Valid JSON array, no explanations.
+  - Valid JSON array, no explanations or descriptions.
   - If the file needs to be created, think about the most apropriate path and file name.
     - Add an attribute {create: true} if so.
   - snippet and sourcePath have to have the same file name (e.g. snippet="route.ts", then sourcePath must be a file named the same: "route.ts")
   - Output in the following format example:
     [{snippet: "snippets/search-handler/route.ts", sourcePath: "app/search/route.ts"]
+
+  JSON result:
   `;
 };
