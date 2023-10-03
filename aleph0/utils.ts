@@ -68,7 +68,7 @@ export async function getProjectStructure(
   const structure = await Promise.all(
     contents.map(async (entry) => {
       const entryPath = path.join(projectRoot, entry.name);
-      if (entry.isDirectory()) {
+      if (entry.isDirectory() && entry.name !== "node_modules") {
         const subStructure = await getProjectStructure(
           entryPath,
           `${indent}  `
