@@ -1,10 +1,4 @@
-import {
-  getKnowledge,
-  getSnippetFiles,
-  getSnippets,
-  loadSnippetMetadata,
-} from "./utils";
-import path from "path";
+import { getKnowledge, getSnippetFiles } from "./utils";
 
 export const findRelevantSnippets = (
   userText: string,
