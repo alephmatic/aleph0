@@ -1,19 +1,27 @@
 import fs from "node:fs";
 import { Command } from "commander";
 import { getProjectStructure, loadSnippets } from "./utils";
-import { findRelevantSnippets } from "./prompts";
+import { createFsActions, findRelevantSnippets } from "./prompts";
 import { ai } from "./openai";
 
 async function generate(text: string) {
-  const snippets = await loadSnippets();
-  // console.log(snippets);
-  // console.log(await getProjectStructure("../examples/next"));
-
   console.log("Creating:", text);
 
   // 1. Find the relevant snippet
+  const snippets = await loadSnippets();
   const relevantSnippet = await ai(findRelevantSnippets(text, snippets));
-  console.log("Relevant snippet:", relevantSnippet);
+  if (!relevantSnippet)
+    throw new Error(`AI returned a bad snippet: ${relevantSnippet}`);
+
+  console.log("Found snippet:", relevantSnippet);
+
+  // 2. Ask openai for fs creation using the snippet and project strucutre
+  const projectStructure = await getProjectStructure("../examples/next");
+  const fsActions = await ai(
+    await createFsActions(text, relevantSnippet, projectStructure)
+  );
+
+  console.log(fsActions);
 }
 
 const program = new Command();
