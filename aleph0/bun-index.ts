@@ -1,7 +1,11 @@
 import fs from "node:fs";
 import { Command } from "commander";
 import { getProjectStructure, loadSnippets } from "./utils";
-import { createFsActions, findRelevantSnippets } from "./prompts";
+import {
+  createChangesArray,
+  createFsActions,
+  findRelevantSnippets,
+} from "./prompts";
 import { ai } from "./openai";
 
 async function generate(text: string) {
@@ -15,13 +19,26 @@ async function generate(text: string) {
 
   console.log("Found snippet:", relevantSnippet);
 
-  // 2. Ask openai for fs creation using the snippet and project strucutre
-  const projectStructure = await getProjectStructure("../examples/next");
-  const fsActions = await ai(
-    await createFsActions(text, relevantSnippet, projectStructure)
+  // 2. Find the relevant files we are dealing with
+  // For each snippet file, find the corresponding file to be created/modified
+  // const changes = [{snippet: 'path', sourceFile: 'path'}]
+  const projectSturcutre = await getProjectStructure("../examples/next");
+  const changesRaw = await ai(
+    await createChangesArray(relevantSnippet, projectSturcutre),
+    "Find what files are relevant for theseS snippets in this project.",
+    "gpt-4"
   );
+  if (!changesRaw)
+    throw new Error(`AI returned a bad changes array: ${relevantSnippet}`);
 
-  console.log(fsActions);
+  const changes = JSON.parse(changesRaw);
+  console.log(changes);
+
+  // 3. For each file in the changes array, ask GPT 4 for the new file and create/modify it.
+  // for(const change of changes) {
+  //   if(change.create)
+  //   fs.mkdirSync(<the path to create>, { recursive: true });
+  // }
 }
 
 const program = new Command();

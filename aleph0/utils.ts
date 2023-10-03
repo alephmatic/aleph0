@@ -19,19 +19,18 @@ export async function loadSnippets() {
   return metadataObjects;
 }
 
-export async function getSnippets(snippetPath: string) {
+export async function getSnippetFiles(snippetPath: string) {
   const snippetsDir = `./snippets/${snippetPath}`;
   const files = await fs.readdir(snippetsDir);
-  const fileContents = await Promise.all(
+  const snippetFiles = await Promise.all(
     files
       .filter((file) => file.endsWith(".txt"))
       .map(async (file) => {
         const filePath = path.join(snippetsDir, file);
-        const contents = await fs.readFile(filePath, "utf8");
-        return `${file}\n${contents}`;
+        return filePath;
       })
   );
-  return `${snippetsDir}\n${fileContents.join("\n")}`;
+  return snippetFiles;
 }
 
 /*
