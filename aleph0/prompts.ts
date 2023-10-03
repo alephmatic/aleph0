@@ -55,3 +55,9 @@ export const createChangesArray = async (
   JSON result:
   `;
 };
+
+export const generateFile = async (snippet: string) => {
+  // TODO
+  return snippet;
+  // return `You are an expert Next.js full-stack developer. Generate a file from the following snippet`;
+};

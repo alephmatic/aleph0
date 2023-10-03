@@ -21,7 +21,7 @@ export async function PATCH(request: Request) {}
 export async function OPTIONS(request: Request) {}
 
 
-File strucutre:
+File structure:
 Example	URL	params
 app/dashboard/[team]/route.js	/dashboard/1	{ team: '1' }
 app/shop/[tag]/[item]/route.js	/shop/1/2	{ tag: '1', item: '2' }
