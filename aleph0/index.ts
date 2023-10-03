@@ -35,7 +35,7 @@ async function generate(text: string) {
 
   const changesSchema = z.array(
     z.object({
-      snippet: z.string(),
+      snippetPath: z.string(),
       sourcePath: z.string(),
     })
   );
@@ -45,8 +45,7 @@ async function generate(text: string) {
 
   // 3. For each file in the changes array, ask GPT 4 for the new file and create/modify it.
   for (const change of changes) {
-    const snippetPath = change.snippet;
-    const snippet = readFile(snippetPath);
+    const snippet = readFile(change.snippetPath);
     const fileContents = await ai(await generateFile(snippet));
     if (!fileContents) throw new Error(`AI returned a bad file`);
     createFile(change.sourcePath, fileContents);
