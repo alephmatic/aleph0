@@ -36,7 +36,7 @@ export async function getSnippetFiles(snippetPath: string) {
 export async function getKnowledge(projectType: string) {
   const folderPath = `./knowledge/${projectType}`;
   const files = await fs.readdir(folderPath);
-  const fileContents = {};
+  const fileContents: { [key: string]: string } = {};
 
   for (const file of files) {
     const fileName = file;

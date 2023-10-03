@@ -9,10 +9,6 @@ export async function ai(
   instructions?: string,
   model = "gpt-3.5-turbo"
 ) {
-  if (process.env.DEBUG) {
-    console.log(`User message: ${content}`);
-  }
-
   let messages: OpenAI.Chat.ChatCompletionMessage[] = [
     { role: "user", content: content },
   ];
