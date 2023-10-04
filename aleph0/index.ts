@@ -9,9 +9,10 @@ import {
   loadSnippets,
 } from "./utils";
 import {
-  createChangesArray,
-  findRelevantSnippet,
-  generateFile,
+  createChangesArrayPrompt,
+  findRelevantSnippetPrompt,
+  createFilePrompt,
+  updateFile,
 } from "./prompts";
 import { ai } from "./openai";
 import { createFile, readFile } from "./lib/file";
@@ -23,7 +24,9 @@ async function generate(userText: string) {
   // 1. Find the relevant snippet
   consola.info(`Step 1 - find the relevant snippet`);
   const snippets = await loadSnippets();
-  const snippetString = await ai(findRelevantSnippet({ userText, snippets }));
+  const snippetString = await ai(
+    findRelevantSnippetPrompt({ userText, snippets })
+  );
   if (!snippetString) throw new Error(`AI didn't return a snippet`);
 
   const snippet = snippetSchema.parse(JSON.parse(snippetString));
@@ -42,7 +45,7 @@ async function generate(userText: string) {
   const specificKnowledge = await getKnowledgeForSnippet(snippet, "nextjs13");
 
   const changesRaw = await ai(
-    await createChangesArray({
+    await createChangesArrayPrompt({
       snippet,
       projectStructure,
       generalKnowledge,
@@ -70,15 +73,37 @@ async function generate(userText: string) {
     `Step 3 - for each file in the changes array, ask GPT 4 for the new file and create/modify it.`
   );
   for (const change of changes) {
-    consola.log(`Change: ${JSON.stringify(change, null, 2)}`);
-    const snippet = readFile(change.snippetPath);
-    const fileContents = await ai(
-      await generateFile({ snippet, userText, specificKnowledge }),
-      undefined,
-      "gpt-4"
-    );
-    if (!fileContents) throw new Error(`AI returned a bad file`);
+    consola.log(`Change operation: ${JSON.stringify(change, null, 2)}`);
+
     const sourceFilePath = path.join(RELATIVE_DIR, change.sourcePath);
+    const sourceFile = Bun.file(sourceFilePath);
+    const snippet = readFile(change.snippetPath);
+
+    let fileContents;
+    if (await sourceFile.exists()) {
+      consola.info("Updating existing file");
+      const currentFileContents = await sourceFile.text();
+      fileContents = await ai(
+        await updateFile({
+          snippet,
+          userText,
+          specificKnowledge,
+          fileContents: currentFileContents,
+        }),
+        undefined,
+        "gpt-4"
+      );
+    } else {
+      consola.info("Creating a new file");
+      fileContents = await ai(
+        await createFilePrompt({ snippet, userText, specificKnowledge }),
+        undefined,
+        "gpt-4"
+      );
+    }
+
+    if (!fileContents) throw new Error(`AI returned a bad file`);
+
     createFile(sourceFilePath, fileContents);
   }
 }
