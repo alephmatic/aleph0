@@ -1,0 +1,8 @@
+{
+  "name": "Table component",
+  "description": "A table that loads data from the API.",
+  "path": "table",
+  "knowledgeMapping": {
+    "route.ts": "route.ts"
+  }
+}
