@@ -1,5 +1,6 @@
 import fs from "fs/promises";
 import path from "path";
+import consola from "consola";
 import { Snippet } from "./types";
 
 /*
@@ -88,7 +89,7 @@ export async function getProjectStructure(
       const entryPath = path.join(projectRoot, entry.name);
       // TODO use .gitignore here?
       if (entry.name === "node_modules" || entry.name === ".next") {
-        console.log('Skipping "node_modules" or ".next" folder');
+        consola.info('Skipping "node_modules" or ".next" folder');
         return "";
       }
       if (entry.isDirectory()) {

@@ -17,7 +17,7 @@ import { createFile, readFile } from "./lib/file";
 import { snippetSchema } from "./types";
 
 async function generate(userText: string) {
-  console.log("Creating:", userText);
+  consola.start("Creating:", userText);
 
   // 1. Find the relevant snippet
   consola.info(`Step 1 - find the relevant snippet`);
@@ -61,7 +61,7 @@ async function generate(userText: string) {
   );
   const changes = changesSchema.parse(JSON.parse(changesRaw));
 
-  console.log(changes);
+  consola.log(changes);
 
   // 3. For each file in the changes array, ask GPT 4 for the new file and create/modify it.
   consola.info(
@@ -93,7 +93,7 @@ program.parse(process.argv);
 // example to create an "article" component with an api route
 // in the future the AI will write the file contents
 
-//   console.log(`Adding form with API route...`);
+//   consola.log(`Adding form with API route...`);
 
 //   // route
 //   const routeFile = Bun.file("./snippets/form-api/route.ts.txt");
@@ -129,4 +129,4 @@ program.parse(process.argv);
 
 //   await Bun.write("../examples/next/app/layout.tsx", updatedLayoutContents);
 
-//   console.log(`✅ Added form with API route`);
+//   consola.log(`✅ Added form with API route`);
