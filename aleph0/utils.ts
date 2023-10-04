@@ -1,10 +1,12 @@
 import fs from "fs/promises";
 import path from "path";
+import consola from "consola";
+import { Snippet } from "./types";
 
 /*
 Finds all of the metadata.json files in the snippets directory returns json array
 */
-export async function loadSnippets() {
+export async function loadSnippets(): Promise<string> {
   const snippetsDir = "./snippets";
   const snippetDirs = await fs.readdir(snippetsDir, { withFileTypes: true });
   const metadataFiles = await Promise.all(
@@ -31,6 +33,23 @@ export async function getSnippetFiles(snippetPath: string) {
       })
   );
   return snippetFiles;
+}
+
+export async function getKnowledgeForSnippet(
+  snippet: Snippet,
+  projectType: string
+) {
+  const snippetsKnowledgeMapping = snippet.knowledgeMapping;
+
+  const knowledge = await getKnowledge(projectType);
+
+  const relevantSnippetKnowledge = Object.keys(snippetsKnowledgeMapping)
+    .map((sk) => {
+      return knowledge[snippetsKnowledgeMapping[sk]];
+    })
+    .join("\n");
+
+  return relevantSnippetKnowledge;
 }
 
 export async function getKnowledge(projectType: string) {
@@ -70,7 +89,7 @@ export async function getProjectStructure(
       const entryPath = path.join(projectRoot, entry.name);
       // TODO use .gitignore here?
       if (entry.name === "node_modules" || entry.name === ".next") {
-        console.log('Skipping "node_modules" or ".next" folder');
+        consola.log('Skipping "node_modules" or ".next" folder');
         return "";
       }
       if (entry.isDirectory()) {

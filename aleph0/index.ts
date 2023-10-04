@@ -1,37 +1,57 @@
 import { Command } from "commander";
 import { z } from "zod";
-import { getProjectStructure, loadSnippets } from "./utils";
+import consola from "consola";
+import {
+  getKnowledge,
+  getKnowledgeForSnippet,
+  getProjectStructure,
+  loadSnippets,
+} from "./utils";
 import {
   createChangesArray,
-  findRelevantSnippets,
+  findRelevantSnippet,
   generateFile,
 } from "./prompts";
 import { ai } from "./openai";
 import { createFile, readFile } from "./lib/file";
+import { snippetSchema } from "./types";
 
-async function generate(text: string) {
-  console.log("Creating:", text);
+async function generate(userText: string) {
+  consola.start("Creating:", userText);
 
   // 1. Find the relevant snippet
+  consola.info(`Step 1 - find the relevant snippet`);
   const snippets = await loadSnippets();
-  const relevantSnippet = await ai(findRelevantSnippets(text, snippets));
-  if (!relevantSnippet)
-    throw new Error(`AI returned a bad snippet: ${relevantSnippet}`);
+  const snippetString = await ai(findRelevantSnippet({ userText, snippets }));
+  if (!snippetString) throw new Error(`AI didn't return a snippet`);
 
-  console.log("Found snippet:", relevantSnippet);
+  const snippet = snippetSchema.parse(JSON.parse(snippetString));
+
+  consola.log("Using snippet:", snippet);
 
   // 2. Find the relevant files we are dealing with
   // For each snippet file, find the corresponding file to be created/modified
   // const changes = [{snippet: 'path', sourceFile: 'path'}]
+  consola.info(`Step 2 - find the relevant files we are dealing with`);
   const projectStructure = await getProjectStructure("../examples/next");
 
+  // Find knowledge relevant to the files, that might help openai decide what and how to change files
+  const knowledge = await getKnowledge("nextjs13");
+  const generalKnowledge = knowledge["general.txt"];
+  const specificKnowledge = await getKnowledgeForSnippet(snippet, "nextjs13");
+
   const changesRaw = await ai(
-    await createChangesArray(relevantSnippet, projectStructure, "nextjs13"),
+    await createChangesArray({
+      snippet,
+      projectStructure,
+      generalKnowledge,
+      specificKnowledge,
+    }),
     "Find what files are relevant for these snippets in this project.",
     "gpt-4"
   );
   if (!changesRaw)
-    throw new Error(`AI returned a bad changes array: ${relevantSnippet}`);
+    throw new Error(`AI returned a bad changes array: ${snippet}`);
 
   const changesSchema = z.array(
     z.object({
@@ -41,13 +61,17 @@ async function generate(text: string) {
   );
   const changes = changesSchema.parse(JSON.parse(changesRaw));
 
-  console.log(changes);
+  consola.log(changes);
 
   // 3. For each file in the changes array, ask GPT 4 for the new file and create/modify it.
+  consola.info(
+    `Step 3 - for each file in the changes array, ask GPT 4 for the new file and create/modify it.`
+  );
   for (const change of changes) {
+    consola.log(`Change: ${JSON.stringify(change, null, 2)}`);
     const snippet = readFile(change.snippetPath);
     const fileContents = await ai(
-      await generateFile(snippet, text),
+      await generateFile({ snippet, userText, specificKnowledge }),
       undefined,
       "gpt-4"
     );
@@ -68,7 +92,7 @@ program.parse(process.argv);
 // example to create an "article" component with an api route
 // in the future the AI will write the file contents
 
-//   console.log(`Adding form with API route...`);
+//   consola.log(`Adding form with API route...`);
 
 //   // route
 //   const routeFile = Bun.file("./snippets/form-api/route.ts.txt");
@@ -104,4 +128,4 @@ program.parse(process.argv);
 
 //   await Bun.write("../examples/next/app/layout.tsx", updatedLayoutContents);
 
-//   console.log(`✅ Added form with API route`);
+//   consola.log(`✅ Added form with API route`);

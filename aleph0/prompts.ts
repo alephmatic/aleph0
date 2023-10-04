@@ -1,37 +1,35 @@
-import { getKnowledge, getSnippetFiles } from "./utils";
+import { Snippet } from "./types";
+import { getSnippetFiles } from "./utils";
 
-export const findRelevantSnippets = (
-  userText: string,
-  snippetsText: string
-) => `
+export const findRelevantSnippet = (options: {
+  userText: string;
+  snippets: string;
+}) => {
+  const { userText, snippets } = options;
+
+  return `
 Given the following snippets, 
 in the following format per snippet: '{name} - {description} (path: {path})\n'
-${snippetsText}
+${snippets}
 
 Output should be a valid json from snippets above.
 return the most relevant snippet above to achieve: "${userText}":\n`;
+};
 
-export const createChangesArray = async (
-  snippet: string,
-  projectStructure: string,
-  projectType: string
-) => {
-  const snippetObj = JSON.parse(snippet);
-  const snippets: string[] = await getSnippetFiles(snippetObj.path);
-  const snippetsKnowledgeMapping = snippetObj.knowledgeMapping;
+export const createChangesArray = async (options: {
+  snippet: Snippet;
+  projectStructure: string;
+  generalKnowledge: string;
+  specificKnowledge: string;
+}) => {
+  const { snippet, projectStructure, generalKnowledge, specificKnowledge } =
+    options;
 
-  const knowledge = await getKnowledge(projectType);
-
-  // Find knowledge relevant to the files, that might help openai decide what and how to change files
-  const relevantSnippetKnowledge = Object.keys(snippetsKnowledgeMapping)
-    .map((sk) => {
-      return knowledge[snippetsKnowledgeMapping[sk]];
-    })
-    .join("\n");
+  const snippets: string[] = await getSnippetFiles(snippet.path);
 
   return `
   You are an expert Next13 fullstack developer.
-  ${knowledge["general.txt"]}
+  ${generalKnowledge}
 
   Assuming the following project structure:
   ${projectStructure}
@@ -40,7 +38,7 @@ export const createChangesArray = async (
   ${snippets.join("\n")}
 
   And the snippet file definitions:
-  ${relevantSnippetKnowledge}
+  ${specificKnowledge}
 
   Return the snippets and relative source files to create/modify.
 
@@ -56,7 +54,13 @@ export const createChangesArray = async (
   `;
 };
 
-export const generateFile = async (snippet: string, userText: string) => {
+export const generateFile = async (options: {
+  snippet: string;
+  userText: string;
+  specificKnowledge: string;
+}) => {
+  const { snippet, userText, specificKnowledge } = options;
+
   return `You are an expert Next.js full-stack developer.
 You are following the user instructions to write code:
 ###
@@ -64,12 +68,17 @@ ${userText}
 ###
 
 Only return valid code that can be pasted directly into the project without editing.
-DO NOT ADD ADDITIONAL COMMENTS OR EXPLANATIONS.
+DO NOT ADD ADDITIONAL COMMENTS OR EXPLANATIONS, NO "\`\`\` MARKDOWN.
 
 This is an example of a valid file from the project. YOU MUST CHANGE THIS TO BE THE ACTUAL FILE FOR OUR USE CASE:
 
 ###
 ${snippet}
 ###
+
+Additional knowledge that can help you:
+${specificKnowledge}
+
+Changed snippet code:
 `;
 };
