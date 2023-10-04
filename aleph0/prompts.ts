@@ -57,7 +57,6 @@ export const createChangesArray = async (options: {
 export const generateFile = async (options: {
   snippet: string;
   userText: string;
-  // generalKnowledge: string;
   specificKnowledge: string;
 }) => {
   const { snippet, userText, specificKnowledge } = options;
