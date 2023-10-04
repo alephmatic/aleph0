@@ -68,7 +68,7 @@ async function generate(userText: string) {
     `Step 3 - for each file in the changes array, ask GPT 4 for the new file and create/modify it.`
   );
   for (const change of changes) {
-    consola.log(`Change: ${change}`);
+    consola.log(`Change: ${JSON.stringify(change, null, 2)}`);
     const snippet = readFile(change.snippetPath);
     const fileContents = await ai(
       await generateFile({ snippet, userText, specificKnowledge }),
@@ -77,7 +77,6 @@ async function generate(userText: string) {
     );
     if (!fileContents) throw new Error(`AI returned a bad file`);
     createFile(change.sourcePath, fileContents);
-    consola.success(`Created file: ${change.sourcePath}`);
   }
 }
 

@@ -89,7 +89,7 @@ export async function getProjectStructure(
       const entryPath = path.join(projectRoot, entry.name);
       // TODO use .gitignore here?
       if (entry.name === "node_modules" || entry.name === ".next") {
-        consola.info('Skipping "node_modules" or ".next" folder');
+        consola.log('Skipping "node_modules" or ".next" folder');
         return "";
       }
       if (entry.isDirectory()) {
