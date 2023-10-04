@@ -1,4 +1,4 @@
-import { getKnowledge, getSnippetFiles } from "./utils";
+import { getKnowledge, getKnowledgeForSnippet, getSnippetFiles } from "./utils";
 
 export const findRelevantSnippets = (
   userText: string,
@@ -18,16 +18,11 @@ export const createChangesArray = async (
 ) => {
   const snippetObj = JSON.parse(snippet);
   const snippets: string[] = await getSnippetFiles(snippetObj.path);
-  const snippetsKnowledgeMapping = snippetObj.knowledgeMapping;
 
   const knowledge = await getKnowledge(projectType);
 
   // Find knowledge relevant to the files, that might help openai decide what and how to change files
-  const relevantSnippetKnowledge = Object.keys(snippetsKnowledgeMapping)
-    .map((sk) => {
-      return knowledge[snippetsKnowledgeMapping[sk]];
-    })
-    .join("\n");
+  const relevantSnippetKnowledge = getKnowledgeForSnippet(snippet, projectType);
 
   return `
   You are an expert Next13 fullstack developer.
@@ -56,7 +51,13 @@ export const createChangesArray = async (
   `;
 };
 
-export const generateFile = async (snippet: string, userText: string) => {
+export const generateFile = async (
+  snippet: string,
+  userText: string,
+  projectType: string
+) => {
+  const relevantSnippetKnowledge = getKnowledgeForSnippet(snippet, projectType);
+
   return `You are an expert Next.js full-stack developer.
 You are following the user instructions to write code:
 ###

@@ -47,7 +47,7 @@ async function generate(text: string) {
   for (const change of changes) {
     const snippet = readFile(change.snippetPath);
     const fileContents = await ai(
-      await generateFile(snippet, text),
+      await generateFile(snippet, text, "nextjs13"),
       undefined,
       "gpt-4"
     );
