@@ -3,7 +3,7 @@ import { getSnippetFiles } from "./utils";
 
 export const findRelevantSnippet = (options: {
   userText: string;
-  snippets: Snippet[];
+  snippets: string;
 }) => {
   const { userText, snippets } = options;
 
