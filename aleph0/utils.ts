@@ -1,10 +1,11 @@
 import fs from "fs/promises";
 import path from "path";
+import { Snippet } from "./types";
 
 /*
 Finds all of the metadata.json files in the snippets directory returns json array
 */
-export async function loadSnippets() {
+export async function loadSnippets(): Promise<Snippet[]> {
   const snippetsDir = "./snippets";
   const snippetDirs = await fs.readdir(snippetsDir, { withFileTypes: true });
   const metadataFiles = await Promise.all(
@@ -16,7 +17,7 @@ export async function loadSnippets() {
   const metadataObjects = metadataFiles
     .map((metadata) => metadata.replace(/[\n]/g, "").replace(/\s\s/g, ""))
     .join("\n");
-  return metadataObjects;
+  return JSON.parse(metadataObjects);
 }
 
 export async function getSnippetFiles(snippetPath: string) {
@@ -34,12 +35,10 @@ export async function getSnippetFiles(snippetPath: string) {
 }
 
 export async function getKnowledgeForSnippet(
-  snippet: string,
+  snippet: Snippet,
   projectType: string
 ) {
-  const snippetObj = JSON.parse(snippet);
-
-  const snippetsKnowledgeMapping = snippetObj.knowledgeMapping;
+  const snippetsKnowledgeMapping = snippet.knowledgeMapping;
 
   const knowledge = await getKnowledge(projectType);
 
