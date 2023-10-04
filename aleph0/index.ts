@@ -12,7 +12,7 @@ import {
   createChangesArrayPrompt,
   findRelevantSnippetPrompt,
   createFilePrompt,
-  updateFile,
+  updateFilePrompt,
 } from "./prompts";
 import { ai } from "./openai";
 import { createFile, readFile } from "./lib/file";
@@ -22,7 +22,7 @@ async function generate(userText: string) {
   consola.start("Creating:", userText);
 
   // 1. Find the relevant snippet
-  consola.info(`Step 1 - find the relevant snippet`);
+  consola.info(`\nStep 1 - find the relevant snippet`);
   const snippets = await loadSnippets();
   const snippetString = await ai(
     findRelevantSnippetPrompt({ userText, snippets })
@@ -36,7 +36,7 @@ async function generate(userText: string) {
   // 2. Find the relevant files we are dealing with
   // For each snippet file, find the corresponding file to be created/modified
   // const changes = [{snippet: 'path', sourceFile: 'path'}]
-  consola.info(`Step 2 - find the relevant files we are dealing with`);
+  consola.info(`\nStep 2 - find the relevant files we are dealing with`);
   const projectStructure = await getProjectStructure("../examples/next");
 
   // Find knowledge relevant to the files, that might help openai decide what and how to change files
@@ -70,7 +70,7 @@ async function generate(userText: string) {
   // 3. For each file in the changes array, ask GPT 4 for the new file and create/modify it.
   const RELATIVE_DIR = "../examples/next";
   consola.info(
-    `Step 3 - for each file in the changes array, ask GPT 4 for the new file and create/modify it.`
+    `\nStep 3 - for each file in the changes array, ask GPT 4 for the new file and create/modify it.`
   );
   for (const change of changes) {
     consola.log(`Change operation: ${JSON.stringify(change, null, 2)}`);
@@ -84,7 +84,7 @@ async function generate(userText: string) {
       consola.info("Updating existing file");
       const currentFileContents = await sourceFile.text();
       fileContents = await ai(
-        await updateFile({
+        await updateFilePrompt({
           snippet,
           userText,
           specificKnowledge,

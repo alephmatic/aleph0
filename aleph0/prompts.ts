@@ -82,7 +82,7 @@ Changed snippet code:
 `;
 };
 
-export const updateFile = async (options: {
+export const updateFilePrompt = async (options: {
   snippet: string;
   userText: string;
   specificKnowledge: string;
