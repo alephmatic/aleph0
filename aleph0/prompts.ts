@@ -69,7 +69,7 @@ ${userText}
 ###
 
 Only return valid code that can be pasted directly into the project without editing.
-DO NOT ADD ADDITIONAL COMMENTS OR EXPLANATIONS.
+DO NOT ADD ADDITIONAL COMMENTS OR EXPLANATIONS, NO "\`\`\` MARKDOWN.
 
 This is an example of a valid file from the project. YOU MUST CHANGE THIS TO BE THE ACTUAL FILE FOR OUR USE CASE:
 
@@ -78,7 +78,8 @@ ${snippet}
 ###
 
 Additional knowledge that can help you:
-
 ${specificKnowledge}
+
+Changed snippet code:
 `;
 };
