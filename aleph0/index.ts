@@ -1,5 +1,6 @@
 import { Command } from "commander";
 import { z } from "zod";
+import path from "path";
 import consola from "consola";
 import {
   getKnowledge,
@@ -8,9 +9,10 @@ import {
   loadSnippets,
 } from "./utils";
 import {
-  createChangesArray,
-  findRelevantSnippet,
-  generateFile,
+  createChangesArrayPrompt,
+  findRelevantSnippetPrompt,
+  createFilePrompt,
+  updateFilePrompt,
 } from "./prompts";
 import { ai } from "./openai";
 import { createFile, readFile } from "./lib/file";
@@ -20,9 +22,11 @@ async function generate(userText: string) {
   consola.start("Creating:", userText);
 
   // 1. Find the relevant snippet
-  consola.info(`Step 1 - find the relevant snippet`);
+  consola.info(`\nStep 1 - find the relevant snippet`);
   const snippets = await loadSnippets();
-  const snippetString = await ai(findRelevantSnippet({ userText, snippets }));
+  const snippetString = await ai(
+    findRelevantSnippetPrompt({ userText, snippets })
+  );
   if (!snippetString) throw new Error(`AI didn't return a snippet`);
 
   const snippet = snippetSchema.parse(JSON.parse(snippetString));
@@ -32,7 +36,7 @@ async function generate(userText: string) {
   // 2. Find the relevant files we are dealing with
   // For each snippet file, find the corresponding file to be created/modified
   // const changes = [{snippet: 'path', sourceFile: 'path'}]
-  consola.info(`Step 2 - find the relevant files we are dealing with`);
+  consola.info(`\nStep 2 - find the relevant files we are dealing with`);
   const projectStructure = await getProjectStructure("../examples/next");
 
   // Find knowledge relevant to the files, that might help openai decide what and how to change files
@@ -41,7 +45,7 @@ async function generate(userText: string) {
   const specificKnowledge = await getKnowledgeForSnippet(snippet, "nextjs13");
 
   const changesRaw = await ai(
-    await createChangesArray({
+    await createChangesArrayPrompt({
       snippet,
       projectStructure,
       generalKnowledge,
@@ -64,19 +68,43 @@ async function generate(userText: string) {
   consola.log(changes);
 
   // 3. For each file in the changes array, ask GPT 4 for the new file and create/modify it.
+  const RELATIVE_DIR = "../examples/next";
   consola.info(
-    `Step 3 - for each file in the changes array, ask GPT 4 for the new file and create/modify it.`
+    `\nStep 3 - for each file in the changes array, ask GPT 4 for the new file and create/modify it.`
   );
   for (const change of changes) {
-    consola.log(`Change: ${JSON.stringify(change, null, 2)}`);
+    consola.log(`Change operation: ${JSON.stringify(change, null, 2)}`);
+
+    const sourceFilePath = path.join(RELATIVE_DIR, change.sourcePath);
+    const sourceFile = Bun.file(sourceFilePath);
     const snippet = readFile(change.snippetPath);
-    const fileContents = await ai(
-      await generateFile({ snippet, userText, specificKnowledge }),
-      undefined,
-      "gpt-4"
-    );
+
+    let fileContents;
+    if (await sourceFile.exists()) {
+      consola.info("Updating existing file");
+      const currentFileContents = await sourceFile.text();
+      fileContents = await ai(
+        await updateFilePrompt({
+          snippet,
+          userText,
+          specificKnowledge,
+          fileContents: currentFileContents,
+        }),
+        undefined,
+        "gpt-4"
+      );
+    } else {
+      consola.info("Creating a new file");
+      fileContents = await ai(
+        await createFilePrompt({ snippet, userText, specificKnowledge }),
+        undefined,
+        "gpt-4"
+      );
+    }
+
     if (!fileContents) throw new Error(`AI returned a bad file`);
-    createFile(change.sourcePath, fileContents);
+
+    createFile(sourceFilePath, fileContents);
   }
 }
 
@@ -88,44 +116,3 @@ program
     generate(text);
   });
 program.parse(process.argv);
-
-// example to create an "article" component with an api route
-// in the future the AI will write the file contents
-
-//   consola.log(`Adding form with API route...`);
-
-//   // route
-//   const routeFile = Bun.file("./snippets/form-api/route.ts.txt");
-//   const routeContents = await routeFile.text();
-//   if (!fs.existsSync("../examples/next/app/api/article"))
-//     fs.mkdirSync("../examples/next/app/api/article", { recursive: true });
-//   await Bun.write("../examples/next/app/api/article/route.ts", routeContents);
-
-//   // form
-//   const formFile = Bun.file("./snippets/form-api/form.tsx.txt");
-//   const formContents = await formFile.text();
-//   if (!fs.existsSync("../examples/next/app"))
-//     fs.mkdirSync("../examples/next/app", { recursive: true });
-//   await Bun.write("../examples/next/app/ArticleForm.tsx", formContents);
-
-//   // toaster - replace file example
-//   const existLayoutFile = Bun.file("../examples/next/app/layout.tsx");
-//   const existingLayoutContents = await existLayoutFile.text();
-
-//   const layoutFile = Bun.file("./snippets/toaster/toaster.tsx.txt");
-//   const layoutContents = await layoutFile.text();
-
-//   const updatedLayoutContents = existingLayoutContents
-//     .replace(
-//       "<body className={inter.className}>{children}</body>",
-//       layoutContents
-//     )
-//     .replace(
-//       `import { Inter } from 'next/font/google'`,
-//       `import { Inter } from 'next/font/google'
-// import { Toaster } from '@/components/ui/toaster'`
-//     );
-
-//   await Bun.write("../examples/next/app/layout.tsx", updatedLayoutContents);
-
-//   consola.log(`✅ Added form with API route`);

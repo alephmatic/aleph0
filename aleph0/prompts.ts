@@ -1,7 +1,7 @@
 import { Snippet } from "./types";
 import { getSnippetFiles } from "./utils";
 
-export const findRelevantSnippet = (options: {
+export const findRelevantSnippetPrompt = (options: {
   userText: string;
   snippets: string;
 }) => {
@@ -16,7 +16,7 @@ Output should be a valid json from snippets above.
 return the most relevant snippet above to achieve: "${userText}":\n`;
 };
 
-export const createChangesArray = async (options: {
+export const createChangesArrayPrompt = async (options: {
   snippet: Snippet;
   projectStructure: string;
   generalKnowledge: string;
@@ -45,7 +45,6 @@ export const createChangesArray = async (options: {
   Rules:
   - Valid JSON array, no explanations or descriptions.
   - If the file needs to be created, think about the most apropriate path and file name.
-    - Add an attribute {create: true} if so.
   - snippetPath and sourcePath have to have the same file name (e.g. snippetPath="route.ts", then sourcePath must be a file named the same: "route.ts")
   - Output in the following format example:
     [{snippetPath: "snippets/search-handler/route.ts", sourcePath: "app/search/route.ts"]
@@ -54,7 +53,7 @@ export const createChangesArray = async (options: {
   `;
 };
 
-export const generateFile = async (options: {
+export const createFilePrompt = async (options: {
   snippet: string;
   userText: string;
   specificKnowledge: string;
@@ -80,5 +79,41 @@ Additional knowledge that can help you:
 ${specificKnowledge}
 
 Changed snippet code:
+`;
+};
+
+export const updateFilePrompt = async (options: {
+  snippet: string;
+  userText: string;
+  specificKnowledge: string;
+  fileContents: string;
+}) => {
+  const { snippet, userText, specificKnowledge, fileContents } = options;
+
+  return `You are an expert Next.js full-stack developer.
+You are following the user instructions to write code:
+###
+${userText}
+###
+
+Only return valid code that can be pasted directly into the project without editing.
+DO NOT ADD ADDITIONAL COMMENTS OR EXPLANATIONS, NO "\`\`\` MARKDOWN, JUST VALID CODE.
+
+This is an example of a valid file from the project.
+
+Using this snippet:
+###
+${snippet}
+###
+
+Additional knowledge that can help you:
+${specificKnowledge}
+
+Update this code, using the information above:
+###
+${fileContents}
+###
+
+Updated code:
 `;
 };
