@@ -19,3 +19,6 @@ Good to know:
   A page is always the leaf of the route subtree.
   .js, .jsx, or .tsx file extensions can be used for Pages.
   A page.js file is required to make a route segment publicly accessible.
+
+Rules:
+  Make sure that every API route in your code correlates directly to where route.ts will be placed.

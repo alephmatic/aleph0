@@ -1,5 +1,6 @@
 import { Command } from "commander";
 import { z } from "zod";
+import path from "path";
 import consola from "consola";
 import {
   getKnowledge,
@@ -64,6 +65,7 @@ async function generate(userText: string) {
   consola.log(changes);
 
   // 3. For each file in the changes array, ask GPT 4 for the new file and create/modify it.
+  const RELATIVE_DIR = "../examples/next";
   consola.info(
     `Step 3 - for each file in the changes array, ask GPT 4 for the new file and create/modify it.`
   );
@@ -76,7 +78,8 @@ async function generate(userText: string) {
       "gpt-4"
     );
     if (!fileContents) throw new Error(`AI returned a bad file`);
-    createFile(change.sourcePath, fileContents);
+    const sourceFilePath = path.join(RELATIVE_DIR, change.sourcePath);
+    createFile(sourceFilePath, fileContents);
   }
 }
 
@@ -88,44 +91,3 @@ program
     generate(text);
   });
 program.parse(process.argv);
-
-// example to create an "article" component with an api route
-// in the future the AI will write the file contents
-
-//   consola.log(`Adding form with API route...`);
-
-//   // route
-//   const routeFile = Bun.file("./snippets/form-api/route.ts.txt");
-//   const routeContents = await routeFile.text();
-//   if (!fs.existsSync("../examples/next/app/api/article"))
-//     fs.mkdirSync("../examples/next/app/api/article", { recursive: true });
-//   await Bun.write("../examples/next/app/api/article/route.ts", routeContents);
-
-//   // form
-//   const formFile = Bun.file("./snippets/form-api/form.tsx.txt");
-//   const formContents = await formFile.text();
-//   if (!fs.existsSync("../examples/next/app"))
-//     fs.mkdirSync("../examples/next/app", { recursive: true });
-//   await Bun.write("../examples/next/app/ArticleForm.tsx", formContents);
-
-//   // toaster - replace file example
-//   const existLayoutFile = Bun.file("../examples/next/app/layout.tsx");
-//   const existingLayoutContents = await existLayoutFile.text();
-
-//   const layoutFile = Bun.file("./snippets/toaster/toaster.tsx.txt");
-//   const layoutContents = await layoutFile.text();
-
-//   const updatedLayoutContents = existingLayoutContents
-//     .replace(
-//       "<body className={inter.className}>{children}</body>",
-//       layoutContents
-//     )
-//     .replace(
-//       `import { Inter } from 'next/font/google'`,
-//       `import { Inter } from 'next/font/google'
-// import { Toaster } from '@/components/ui/toaster'`
-//     );
-
-//   await Bun.write("../examples/next/app/layout.tsx", updatedLayoutContents);
-
-//   consola.log(`✅ Added form with API route`);

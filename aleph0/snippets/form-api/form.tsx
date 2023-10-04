@@ -1,11 +1,11 @@
-"use client"
+"use client";
 
 // based on: https://ui.shadcn.com/docs/components/form
 
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import * as z from "zod"
-import { Button } from "@/components/ui/button"
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -14,11 +14,17 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useToast } from "@/components/ui/use-toast"
-import { postRequest } from "@/lib/api"
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useToast } from "@/components/ui/use-toast";
+import { postRequest } from "@/lib/api";
 
 const formSchema = z.object({
   username: z.string().min(2, {
@@ -26,11 +32,11 @@ const formSchema = z.object({
   }),
   email: z.string().email(),
   city: z.enum(["London", "New York", "Tokyo"]),
-})
-type FormSchema = z.infer<typeof formSchema>
+});
+type FormSchema = z.infer<typeof formSchema>;
 
 export function ProfileForm() {
-  const { toast } = useToast()
+  const { toast } = useToast();
 
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
@@ -39,7 +45,7 @@ export function ProfileForm() {
       email: "",
       city: "London",
     },
-  })
+  });
 
   async function onSubmit(values: FormSchema) {
     try {
@@ -51,13 +57,13 @@ export function ProfileForm() {
       toast({
         title: "Profile updated",
         description: `${JSON.stringify(res, null, 2)}`,
-      })
+      });
     } catch (error: any) {
       toast({
         variant: "destructive",
         title: "Error",
         description: `There was an error: ${error.message}`,
-      })
+      });
     }
   }
 
@@ -121,5 +127,5 @@ export function ProfileForm() {
         <Button type="submit">Submit</Button>
       </form>
     </Form>
-  )
+  );
 }
