@@ -1,17 +1,15 @@
 import { NextResponse } from "next/server";
+import { userProfileBody } from "@/api/user/settings/validation";
 
-// export const POST = withError(async (request: Request) => {
+// update user profile API route
 export const POST = async (request: Request) => {
-  // const session = await getAuthSession();
-  // if (!session)
-  //   return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-
   const json = await request.json();
-  // TODO use zod to validate
-  // const body = userSettingsBody.parse(json);
+  const body = userProfileBody.parse(json);
 
   // TODO
-  const result = json;
+  // process data
+
+  const result = body;
 
   return NextResponse.json(result);
 };
