@@ -9,3 +9,9 @@ Next.js boilerplate with AI capabilities to 10x your dev time.
 
 To retract changes in the next directory:
 `git checkout origin/main -- ../examples/`
+
+## Examples
+
+```sh
+bun index.ts gen "add a form that creates a blog post"
+```
