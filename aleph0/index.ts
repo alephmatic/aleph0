@@ -4,7 +4,6 @@ import path from "path";
 import consola from "consola";
 import {
   getKnowledge,
-  getKnowledgeForSnippet,
   getProjectStructure,
   loadSnippets,
   removeCodeWrapper,
@@ -20,15 +19,22 @@ import { ai } from "./openai";
 import { createFile, readFile } from "./lib/file";
 import { snippetSchema } from "./types";
 
-async function generate(originalUserText: string) {
+async function generate(
+  originalUserText: string,
+  regenerateDescription: boolean
+) {
   consola.start("Creating:", originalUserText, "\n");
 
-  // NOTE: this step may not product better results. Comment out if necessary.
-  consola.info(`Step 1a - create a cleaner task description`);
-  const userText = await ai(
-    createTaskDescriptionPrompt({ userText: originalUserText })
-  );
-  if (!userText) throw new Error(`AI didn't return a description`);
+  let userText = originalUserText;
+
+  if (regenerateDescription) {
+    consola.info(`Step 1a - create a cleaner task description`);
+    const regeneratedUserText = await ai(
+      createTaskDescriptionPrompt({ userText: originalUserText })
+    );
+    if (!regeneratedUserText) throw new Error(`AI didn't return a description`);
+    userText = regeneratedUserText;
+  }
 
   consola.info(`Step 1b - find the relevant snippet`);
   const snippets = await loadSnippets();
@@ -90,7 +96,8 @@ async function generate(originalUserText: string) {
     const sourceFilePath = path.join(RELATIVE_DIR, change.sourcePath);
     const sourceFile = Bun.file(sourceFilePath);
     const snippet = readFile(change.snippetPath);
-    const routeKnowledge = knowledge[change.snippetPath.split("/").at(-1)]; // TODO fix this
+    const routeKnowledge =
+      knowledge[change.snippetPath.split("/").at(-1) || ""]; // TODO fix this
 
     let fileContents;
     if (await sourceFile.exists()) {
@@ -126,7 +133,11 @@ const program = new Command();
 program
   .command("gen <text>")
   .description("Generate nextjs snippet.")
-  .action((text) => {
-    generate(text);
+  .option(
+    "-srd, --skip-regenerate-description",
+    "AI will skip regenerating the description",
+  )
+  .action((text, options) => {
+    generate(text, !options.skipRegenerateDescription);
   });
 program.parse(process.argv);
