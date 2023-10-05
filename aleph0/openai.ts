@@ -20,6 +20,8 @@ export async function ai(
   const chatCompletion = await openai.chat.completions.create({
     messages,
     model,
+    temperature: 0,
+    frequency_penalty: 0,
   });
 
   spinner.succeed();
