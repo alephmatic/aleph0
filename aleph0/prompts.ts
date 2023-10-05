@@ -8,8 +8,7 @@ export const findRelevantSnippetPrompt = (options: {
   const { userText, snippets } = options;
 
   return `
-Given the following snippets, 
-in the following format per snippet: '{name} - {description} (path: {path})\n'
+Given the following snippets, in the following format per snippet: '{name} - {description} (path: {path})\n'
 ${snippets}
 
 Output should be a valid json from snippets above.
@@ -28,16 +27,20 @@ export const createChangesArrayPrompt = async (options: {
   const snippets: string[] = await getSnippetFiles(snippet.path);
 
   return `
-  You are an expert Next13 fullstack developer.
+  You are an expert Next.js full-stack developer.
   ${generalKnowledge}
 
-  Assuming the following project structure:
+  Your project has the following structure:
+  ###
   ${projectStructure}
+  ###
 
-  And the following snippet files:
+  You are given the following snippet files:
+  ###
   ${snippets.join("\n")}
+  ###
 
-  And the snippet file definitions:
+  You have received the following documentation:
   ${specificKnowledge}
 
   Return the snippets and relative source files to create/modify.
