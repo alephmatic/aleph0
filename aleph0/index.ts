@@ -9,8 +9,9 @@ import {
   loadSnippets,
 } from "./utils";
 import {
-  createChangesArrayPrompt,
+  createTaskDescriptionPrompt,
   findRelevantSnippetPrompt,
+  createChangesArrayPrompt,
   createFilePrompt,
   updateFilePrompt,
 } from "./prompts";
@@ -18,11 +19,17 @@ import { ai } from "./openai";
 import { createFile, readFile } from "./lib/file";
 import { snippetSchema } from "./types";
 
-async function generate(userText: string) {
-  consola.start("Creating:", userText);
+async function generate(originalUserText: string) {
+  consola.start("Creating:", originalUserText, "\n");
 
-  // 1. Find the relevant snippet
-  consola.info(`\nStep 1 - find the relevant snippet`);
+  // NOTE: this step may not product better results. Comment out if necessary.
+  consola.info(`Step 1a - create a cleaner task description`);
+  const userText = await ai(
+    createTaskDescriptionPrompt({ userText: originalUserText })
+  );
+  if (!userText) throw new Error(`AI didn't return a description`);
+
+  consola.info(`Step 1b - find the relevant snippet`);
   const snippets = await loadSnippets();
   const snippetString = await ai(
     findRelevantSnippetPrompt({ userText, snippets })

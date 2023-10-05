@@ -1,15 +1,26 @@
 import { Snippet } from "./types";
 import { getSnippetFiles } from "./utils";
 
+export const createTaskDescriptionPrompt = (options: { userText: string }) => {
+  const { userText } = options;
+
+  return `You are an expert full-stack developer.
+Create a more complete description of this task to pass on to an AI agent.
+The description should be kept to 1-2 lines if possible.
+${userText}
+  
+Task description:`;
+};
+
 export const findRelevantSnippetPrompt = (options: {
   userText: string;
-  snippets: string;
+  snippets: Snippet[];
 }) => {
   const { userText, snippets } = options;
 
   return `
 Given the following snippets, in the following format per snippet: '{name} - {description} (path: {path})'\n
-${snippets}
+${JSON.stringify(snippets)}
 
 Output should be a valid json from snippets above.
 return the most relevant snippet above to achieve: "${userText}":\n`;
