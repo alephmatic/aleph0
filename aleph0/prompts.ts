@@ -8,7 +8,7 @@ export const findRelevantSnippetPrompt = (options: {
   const { userText, snippets } = options;
 
   return `
-Given the following snippets, in the following format per snippet: '{name} - {description} (path: {path})\n'
+Given the following snippets, in the following format per snippet: '{name} - {description} (path: {path})'\n
 ${snippets}
 
 Output should be a valid json from snippets above.
