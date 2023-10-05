@@ -1,7 +1,5 @@
 "use client";
 
-// based on: https://ui.shadcn.com/docs/components/form
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
