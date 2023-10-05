@@ -50,14 +50,17 @@ async function generate(originalUserText: string) {
   // Find knowledge relevant to the files, that might help openai decide what and how to change files
   const knowledge = await getKnowledge("nextjs13");
   const generalKnowledge = knowledge["general.txt"];
-  const specificKnowledge = await getKnowledgeForSnippet(snippet, "nextjs13");
+  const routesKnowledge = Object.keys(knowledge)
+    .filter((k) => k != "general.txt")
+    .map((k) => knowledge[k])
+    .join("\n");
 
   const changesRaw = await ai(
     await createChangesArrayPrompt({
       snippet,
       projectStructure,
       generalKnowledge,
-      specificKnowledge,
+      routesKnowledge,
     }),
     "Find what files are relevant for these snippets in this project.",
     "gpt-4"
@@ -87,6 +90,7 @@ async function generate(originalUserText: string) {
     const sourceFilePath = path.join(RELATIVE_DIR, change.sourcePath);
     const sourceFile = Bun.file(sourceFilePath);
     const snippet = readFile(change.snippetPath);
+    const routeKnowledge = knowledge[change.snippetPath.split("/").at(-1)]; // TODO fix this
 
     let fileContents;
     if (await sourceFile.exists()) {
@@ -96,7 +100,7 @@ async function generate(originalUserText: string) {
         await updateFilePrompt({
           snippet,
           userText,
-          specificKnowledge,
+          routeKnowledge,
           fileContents: currentFileContents,
         }),
         undefined,
@@ -105,7 +109,7 @@ async function generate(originalUserText: string) {
     } else {
       consola.info("Creating a new file");
       fileContents = await ai(
-        await createFilePrompt({ snippet, userText, specificKnowledge }),
+        await createFilePrompt({ snippet, userText, routeKnowledge }),
         undefined,
         "gpt-4"
       );

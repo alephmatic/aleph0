@@ -1,4 +1,4 @@
-A page is UI that is unique to a route. You can define pages by exporting a component from a page.js file. Use nested folders to define a route and a page.js file to make the route publicly accessible.
+A page is UI that is unique to a route. You can define pages by exporting a component from a page.jsx file. Use nested folders to define a route and a page.js file to make the route publicly accessible.
 
 Examples:
 app/page.tsx
@@ -21,4 +21,5 @@ Good to know:
   A page.js file is required to make a route segment publicly accessible.
 
 Rules:
-  Make sure that every API route in your code correlates directly to where route.ts will be placed.
+  - Make sure that every API route in your code correlates directly to where route.ts will be placed.
+  - Place page files only under app/ NOT under app/components/

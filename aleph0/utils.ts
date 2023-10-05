@@ -36,23 +36,6 @@ export async function getSnippetFiles(snippetPath: string) {
   return snippetFiles;
 }
 
-export async function getKnowledgeForSnippet(
-  snippet: Snippet,
-  projectType: string
-) {
-  const snippetsKnowledgeMapping = snippet.knowledgeMapping;
-
-  const knowledge = await getKnowledge(projectType);
-
-  const relevantSnippetKnowledge = Object.keys(snippetsKnowledgeMapping)
-    .map((sk) => {
-      return knowledge[snippetsKnowledgeMapping[sk]];
-    })
-    .join("\n");
-
-  return relevantSnippetKnowledge;
-}
-
 export async function getKnowledge(projectType: string) {
   const folderPath = `./knowledge/${projectType}`;
   const files = await fs.readdir(folderPath);

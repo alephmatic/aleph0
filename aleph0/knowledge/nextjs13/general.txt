@@ -25,3 +25,16 @@ Next.js uses a file-system based router where folders are used to define routes.
 Each folder represents a route segment that maps to a URL segment. To create a nested route, you can nest folders inside each other.
 A Dynamic Segment can be created by wrapping a folder's name in square brackets: [folderName]. For example, [id] or [slug].
 
+Notes
+DO NOT update files in this path (components/ui/...), only create new ones.
+components/
+  ui/
+    form.tsx
+    label.tsx
+    toaster.tsx
+    use-toast.ts
+    input.tsx
+    select.tsx
+    button.tsx
+    table.tsx
+    toast.tsx

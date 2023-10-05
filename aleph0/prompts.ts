@@ -30,9 +30,9 @@ export const createChangesArrayPrompt = async (options: {
   snippet: Snippet;
   projectStructure: string;
   generalKnowledge: string;
-  specificKnowledge: string;
+  routesKnowledge: string;
 }) => {
-  const { snippet, projectStructure, generalKnowledge, specificKnowledge } =
+  const { snippet, projectStructure, generalKnowledge, routesKnowledge } =
     options;
 
   const snippets: string[] = await getSnippetFiles(snippet.path);
@@ -52,7 +52,7 @@ ${snippets.join("\n")}
 ###
 
 You have received the following documentation:
-${specificKnowledge}
+${routesKnowledge}
 
 Return the snippets and relative source files to create/modify.
 
@@ -62,6 +62,18 @@ Rules:
 - snippetPath and sourcePath have to have the same file name (e.g. snippetPath="route.ts", then sourcePath must be a file named the same: "route.ts")
 - Output in the following format example:
   [{snippetPath: "snippets/search-handler/route.ts", sourcePath: "app/search/route.ts"]
+- DO NOT USE THE FOLLOWING PATHS as sourcePaths:
+components/
+  ui/
+    form.tsx
+    label.tsx
+    toaster.tsx
+    use-toast.ts
+    input.tsx
+    select.tsx
+    button.tsx
+    table.tsx
+    toast.tsx
 
 JSON result:
   `;
@@ -70,21 +82,19 @@ JSON result:
 const CODE_GEN_RULES = `
 RULES:
 - MAKE SURE TO FILL ANY UNFINISHED CODE (TODO), MAKE THE CODE COMPLETE.
+- ONLY RETURN ONE FILE CONTENTS, NOT MULTIPLE.
 - OUTPUT MUST NOT BE A CONVERSATION OR DESCRIPTION, SOURCE CODE ONLY.
 `;
 
 export const createFilePrompt = async (options: {
   snippet: string;
   userText: string;
-  specificKnowledge: string;
+  routeKnowledge: string;
 }) => {
-  const { snippet, userText, specificKnowledge } = options;
+  const { snippet, userText, routeKnowledge } = options;
 
   return `You are an expert Next.js full-stack developer.
-You are following the user instructions to write code:
-###
-${userText}
-###
+You are following the user instructions to write code: ${userText}
 
 This is a snippet you need to change to generate the final code:
 ###
@@ -92,7 +102,7 @@ ${snippet}
 ###
 
 Additional knowledge that can help you:
-${specificKnowledge}
+${routeKnowledge}
 
 ${CODE_GEN_RULES}
 
@@ -104,16 +114,13 @@ Final changed snippet code:
 export const updateFilePrompt = async (options: {
   snippet: string;
   userText: string;
-  specificKnowledge: string;
+  routeKnowledge: string;
   fileContents: string;
 }) => {
-  const { snippet, userText, specificKnowledge, fileContents } = options;
+  const { snippet, userText, routeKnowledge, fileContents } = options;
 
   return `You are an expert Next.js full-stack developer.
-You are following the user instructions to write code:
-###
-${userText}
-###
+You are following the user instructions to write code: ${userText}
 
 This is a snippet you need to use to generate the final code:
 ###
@@ -121,7 +128,7 @@ ${snippet}
 ###
 
 Additional knowledge that can help you:
-${specificKnowledge}
+${routeKnowledge}
 
 Update this code, using the information and snippet above:
 ###
