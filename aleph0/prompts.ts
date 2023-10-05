@@ -111,7 +111,7 @@ ${userText}
 ###
 
 Only return valid code that can be pasted directly into the project without editing.
-DO NOT ADD ADDITIONAL COMMENTS OR EXPLANATIONS, NO "\`\`\` MARKDOWN, JUST VALID CODE.
+DO NOT ADD ADDITIONAL COMMENTS OR EXPLANATIONS, NO MARKDOWN, JUST VALID CODE.
 
 This is an example of a valid file from the project.
 
