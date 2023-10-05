@@ -106,3 +106,7 @@ export async function getProjectStructure(
   );
   return structure.filter(Boolean).join("\n");
 }
+
+export function removeCodeWrapper(code: string) {
+  return code.replace(/^###$/gm, "");
+}

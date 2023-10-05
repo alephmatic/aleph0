@@ -67,6 +67,12 @@ JSON result:
   `;
 };
 
+const CODE_GEN_RULES = `
+RULES:
+- MAKE SURE TO FILL ANY UNFINISHED CODE (TODO), MAKE THE CODE COMPLETE.
+- OUTPUT MUST NOT BE A CONVERSATION OR DESCRIPTION, SOURCE CODE ONLY.
+`;
+
 export const createFilePrompt = async (options: {
   snippet: string;
   userText: string;
@@ -80,11 +86,7 @@ You are following the user instructions to write code:
 ${userText}
 ###
 
-Only return valid code that can be pasted directly into the project without editing.
-DO NOT ADD ADDITIONAL COMMENTS OR EXPLANATIONS, NO "\`\`\` MARKDOWN.
-
-This is an example of a valid file from the project. YOU MUST CHANGE THIS TO BE THE ACTUAL FILE FOR OUR USE CASE:
-
+This is a snippet you need to change to generate the final code:
 ###
 ${snippet}
 ###
@@ -92,7 +94,10 @@ ${snippet}
 Additional knowledge that can help you:
 ${specificKnowledge}
 
-Changed snippet code:
+${CODE_GEN_RULES}
+
+Final changed snippet code:
+###
 `;
 };
 
@@ -110,12 +115,7 @@ You are following the user instructions to write code:
 ${userText}
 ###
 
-Only return valid code that can be pasted directly into the project without editing.
-DO NOT ADD ADDITIONAL COMMENTS OR EXPLANATIONS, NO MARKDOWN, JUST VALID CODE.
-
-This is an example of a valid file from the project.
-
-Using this snippet:
+This is a snippet you need to use to generate the final code:
 ###
 ${snippet}
 ###
@@ -123,11 +123,14 @@ ${snippet}
 Additional knowledge that can help you:
 ${specificKnowledge}
 
-Update this code, using the information above:
+Update this code, using the information and snippet above:
 ###
 ${fileContents}
 ###
 
-Updated code:
+${CODE_GEN_RULES}
+
+Final updated code:
+###
 `;
 };
