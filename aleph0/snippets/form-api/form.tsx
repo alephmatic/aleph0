@@ -2,7 +2,6 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -23,21 +22,22 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
 import { postRequest } from "@/lib/api";
+import { userProfileBody, UserProfileBody } from "@/api/user/settings/validation";
 
-const formSchema = z.object({
-  username: z.string().min(2, {
-    message: "Username must be at least 2 characters.",
-  }),
-  email: z.string().email(),
-  city: z.enum(["London", "New York", "Tokyo"]),
-});
-type FormSchema = z.infer<typeof formSchema>;
+// this zod schema is defined in "@/api/user/settings/validation"
+// const userProfileSchema = z.object({
+//   username: z.string().min(2, {
+//     message: "Username must be at least 2 characters.",
+//   }),
+//   email: z.string().email(),
+//   city: z.enum(["London", "New York", "Tokyo"]),
+// });
 
 export function ProfileForm() {
   const { toast } = useToast();
 
-  const form = useForm<FormSchema>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<UserProfileBody>({
+    resolver: zodResolver(userProfileBody),
     defaultValues: {
       username: "",
       email: "",
@@ -45,9 +45,9 @@ export function ProfileForm() {
     },
   });
 
-  async function onSubmit(values: FormSchema) {
+  async function onSubmit(values: UserProfileBody) {
     try {
-      const res = await postRequest<any, FormSchema>(
+      const res = await postRequest<any, UserProfileBody>(
         "/api/user/settings",
         values
       );
