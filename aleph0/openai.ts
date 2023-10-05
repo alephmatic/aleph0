@@ -16,6 +16,7 @@ export async function ai(
   consola.debug("OpenAI content:");
   consola.debug(content);
 
+
   let messages: OpenAI.Chat.ChatCompletionMessage[] = [
     { role: "user", content },
   ];
@@ -37,4 +38,5 @@ export async function ai(
   consola.debug(result);
 
   return result;
+
 }
