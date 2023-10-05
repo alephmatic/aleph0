@@ -6,7 +6,7 @@ import { Snippet } from "./types";
 /*
 Finds all of the metadata.json files in the snippets directory returns json array
 */
-export async function loadSnippets(): Promise<string> {
+export async function loadSnippets(): Promise<Snippet[]> {
   const snippetsDir = "./snippets";
   const snippetDirs = await fs.readdir(snippetsDir, { withFileTypes: true });
   const metadataFiles = await Promise.all(
@@ -17,7 +17,8 @@ export async function loadSnippets(): Promise<string> {
   );
   const metadataObjects = metadataFiles
     .map((metadata) => metadata.replace(/[\n]/g, "").replace(/\s\s/g, ""))
-    .join("\n");
+    .map((metadata) => JSON.parse(metadata));
+
   return metadataObjects;
 }
 

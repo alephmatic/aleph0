@@ -1,3 +1,4 @@
+import consola from "consola";
 import OpenAI from "openai";
 import ora from "ora";
 
@@ -10,13 +11,18 @@ export async function ai(
   instructions?: string,
   model: "gpt-3.5-turbo" | "gpt-4" = "gpt-3.5-turbo"
 ) {
-  const spinner = ora("Calling OpenAI").start();
+  const spinner = ora("Calling OpenAI\n").start();
+
+  consola.debug("OpenAI content:");
+  consola.debug(content);
+
 
   let messages: OpenAI.Chat.ChatCompletionMessage[] = [
-    { role: "user", content: content },
+    { role: "user", content },
   ];
   if (instructions)
     messages = [{ role: "system", content: instructions }, ...messages];
+
   const chatCompletion = await openai.chat.completions.create({
     messages,
     model,
@@ -26,5 +32,11 @@ export async function ai(
 
   spinner.succeed();
 
-  return chatCompletion.choices[0].message.content;
+  const result = chatCompletion.choices[0].message.content;
+
+  consola.debug("OpenAI result:");
+  consola.debug(result);
+
+  return result;
+
 }

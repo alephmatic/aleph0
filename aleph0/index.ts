@@ -9,8 +9,9 @@ import {
   loadSnippets,
 } from "./utils";
 import {
-  createChangesArrayPrompt,
+  createTaskDescriptionPrompt,
   findRelevantSnippetPrompt,
+  createChangesArrayPrompt,
   createFilePrompt,
   updateFilePrompt,
 } from "./prompts";
@@ -18,11 +19,17 @@ import { ai } from "./openai";
 import { createFile, readFile } from "./lib/file";
 import { snippetSchema } from "./types";
 
-async function generate(userText: string) {
-  consola.start("Creating:", userText);
+async function generate(originalUserText: string) {
+  consola.start("Creating:", originalUserText, "\n");
 
-  // 1. Find the relevant snippet
-  consola.info(`\nStep 1 - find the relevant snippet`);
+  // NOTE: this step may not product better results. Comment out if necessary.
+  consola.info(`Step 1a - create a cleaner task description`);
+  const userText = await ai(
+    createTaskDescriptionPrompt({ userText: originalUserText })
+  );
+  if (!userText) throw new Error(`AI didn't return a description`);
+
+  consola.info(`Step 1b - find the relevant snippet`);
   const snippets = await loadSnippets();
   const snippetString = await ai(
     findRelevantSnippetPrompt({ userText, snippets })
@@ -31,12 +38,12 @@ async function generate(userText: string) {
 
   const snippet = snippetSchema.parse(JSON.parse(snippetString));
 
-  consola.log("Using snippet:", snippet);
+  consola.log("Using snippet:", snippet, "\n");
 
   // 2. Find the relevant files we are dealing with
   // For each snippet file, find the corresponding file to be created/modified
   // const changes = [{snippet: 'path', sourceFile: 'path'}]
-  consola.info(`\nStep 2 - find the relevant files we are dealing with`);
+  consola.info(`Step 2 - find the relevant files we are dealing with`);
   const projectStructure = await getProjectStructure("../examples/next");
 
   // Find knowledge relevant to the files, that might help openai decide what and how to change files
@@ -66,11 +73,12 @@ async function generate(userText: string) {
   const changes = changesSchema.parse(JSON.parse(changesRaw));
 
   consola.log(changes);
+  consola.log("\n");
 
   // 3. For each file in the changes array, ask GPT 4 for the new file and create/modify it.
   const RELATIVE_DIR = "../examples/next";
   consola.info(
-    `\nStep 3 - for each file in the changes array, ask GPT 4 for the new file and create/modify it.`
+    `Step 3 - for each file in the changes array, ask GPT 4 for the new file and create/modify it.`
   );
   for (const change of changes) {
     consola.log(`Change operation: ${JSON.stringify(change, null, 2)}`);
