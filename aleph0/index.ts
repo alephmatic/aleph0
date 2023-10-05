@@ -7,6 +7,7 @@ import {
   getKnowledgeForSnippet,
   getProjectStructure,
   loadSnippets,
+  removeCodeWrapper,
 } from "./utils";
 import {
   createTaskDescriptionPrompt,
@@ -112,7 +113,14 @@ async function generate(originalUserText: string) {
 
     if (!fileContents) throw new Error(`AI returned a bad file`);
 
-    createFile(sourceFilePath, fileContents);
+    console.log("***");
+    console.log(fileContents);
+    console.log("***");
+    const cleanCode = removeCodeWrapper(fileContents);
+    console.log("+++");
+    console.log(cleanCode);
+    console.log("+++");
+    createFile(sourceFilePath, cleanCode);
   }
 }
 
