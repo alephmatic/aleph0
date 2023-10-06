@@ -18,6 +18,8 @@ import { ai } from "./openai";
 import { createFile, readFile } from "./lib/file";
 import { ChangesSchema, Snippet, changesSchema, snippetSchema } from "./types";
 
+const PROJECT_DIR = "../examples/next";
+
 async function generate(
   originalUserPrompt: string,
   regenerateDescription: boolean
@@ -31,8 +33,8 @@ async function generate(
     originalUserPrompt,
     regenerateDescription
   );
-  const snippet = await findRelevantSnippet(userPrompt);
-  const changes = await findRelevantFiles(
+  const snippet = await chooseSnippet(userPrompt);
+  const changes = await findProjectFiles(
     snippet,
     generalKnowledge,
     routesKnowledge
@@ -57,8 +59,8 @@ async function generateDescription(
   return regeneratedUserPrompt;
 }
 
-async function findRelevantSnippet(userPrompt: string): Promise<Snippet> {
-  consola.info(`Step 1b - find the relevant snippet`);
+async function chooseSnippet(userPrompt: string): Promise<Snippet> {
+  consola.info(`Step 1b - choose the snippet to use for this task`);
   const snippets = await loadSnippets();
   const snippetString = await ai(
     findRelevantSnippetPrompt({ userPrompt, snippets })
@@ -69,15 +71,13 @@ async function findRelevantSnippet(userPrompt: string): Promise<Snippet> {
   return snippet;
 }
 
-async function findRelevantFiles(
+async function findProjectFiles(
   snippet: Snippet,
   generalKnowledge: string,
   routesKnowledge: string
 ): Promise<ChangesSchema> {
-  // For each snippet file, find the corresponding file to be created/modified
-  // const changes = [{snippet: 'path', sourceFile: 'path'}]
-  consola.info(`Step 2 - find the relevant files we are dealing with`);
-  const projectStructure = await getProjectStructure("../examples/next");
+  consola.info(`Step 2 - find the project files to edit`);
+  const projectStructure = await getProjectStructure(PROJECT_DIR);
 
   const changesRaw = await ai(
     await createChangesArrayPrompt({
@@ -102,8 +102,6 @@ async function generateNewFiles(
   changes: ChangesSchema,
   knowledge: Record<string, string>
 ) {
-  const RELATIVE_DIR = "../examples/next";
-
   consola.info(
     `Step 3 - for each file in the changes array, ask GPT 4 for the new file and create/modify it.`
   );
@@ -111,7 +109,7 @@ async function generateNewFiles(
   for (const change of changes) {
     consola.log(`Change operation: ${JSON.stringify(change, null, 2)}`);
 
-    const sourceFilePath = path.join(RELATIVE_DIR, change.sourcePath);
+    const sourceFilePath = path.join(PROJECT_DIR, change.sourcePath);
     const sourceFile = Bun.file(sourceFilePath);
     const snippet = readFile(change.snippetPath);
     const routeKnowledge =
