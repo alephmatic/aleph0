@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
 import { postRequest } from "@/lib/api";
-import { userProfileBody, UserProfileBody } from "@/api/user/settings/validation";
+import { userProfileBody, UserProfileBody } from "@/app/api/user/settings/validation";
 
 // this zod schema is defined in "@/api/user/settings/validation"
 // const userProfileSchema = z.object({
