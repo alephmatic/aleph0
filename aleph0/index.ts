@@ -35,10 +35,12 @@ async function generate(
   );
   const snippet = await chooseSnippet(userPrompt);
   const changes = await findProjectFiles(
+    userPrompt,
     snippet,
     generalKnowledge,
     routesKnowledge
   );
+  return // TODO remove
   const newFiles = await generateNewFiles(userPrompt, changes, knowledge);
 
   return newFiles;
@@ -72,6 +74,7 @@ async function chooseSnippet(userPrompt: string): Promise<Snippet> {
 }
 
 async function findProjectFiles(
+  userPrompt: string,
   snippet: Snippet,
   generalKnowledge: string,
   routesKnowledge: string
@@ -81,6 +84,7 @@ async function findProjectFiles(
 
   const changesRaw = await ai(
     await createChangesArrayPrompt({
+      userPrompt,
       snippet,
       projectStructure,
       generalKnowledge,

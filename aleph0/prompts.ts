@@ -1,7 +1,9 @@
 import { Snippet } from "./types";
 import { getSnippetFiles } from "./utils";
 
-export const createTaskDescriptionPrompt = (options: { userPrompt: string }) => {
+export const createTaskDescriptionPrompt = (options: {
+  userPrompt: string;
+}) => {
   const { userPrompt } = options;
 
   return `You are an expert full-stack developer.
@@ -27,15 +29,48 @@ return the most relevant snippet above to achieve: "${userPrompt}":\n`;
 };
 
 export const createChangesArrayPrompt = async (options: {
+  userPrompt: string;
   snippet: Snippet;
   projectStructure: string;
   generalKnowledge: string;
   routesKnowledge: string;
 }) => {
-  const { snippet, projectStructure, generalKnowledge, routesKnowledge } =
+  const { userPrompt, snippet, projectStructure, generalKnowledge, routesKnowledge } =
     options;
 
   const snippets: string[] = await getSnippetFiles(snippet.path);
+
+  return `You are an expert Next.js full-stack developer.
+
+Your feedback is needed to create a new feature in the app:
+"${userPrompt}"
+
+You are given snippets to add to a project:
+
+- FORM
+- ROUTE
+- VALIDATION
+
+It is your job to choose the relative paths for where these snippets should be added in the project.
+
+General instructions about this collection of snippets:
+
+${[
+  "This snippet collection adds a form with an API endpoint to the app.",
+  "The form should be placed on the frontend in a `forms/<FORM>.ts` file.",
+  "The `route.ts` file should be placed at `app/api/<FEATURE>/route.ts`. This can be imported as import '@/app/api/<FEATURE>/route.ts'.",
+  "The `validation.ts` file should be placed at `app/api/<FEATURE>/validation.ts`. This can be imported as import '@/app/api/<FEATURE>/validation.ts'.",
+  "<FEATURE> and <FORM> are placeholders that should be replaced with the correct values.",
+].join("\n")}
+
+Return a JSON array of the following format:
+[
+  { "snippetName": "SNIPPET_NAME_1", "filePath": "PATH_1" },
+  { "snippetName": "SNIPPET_NAME_2", "filePath": "PATH_2" }
+]
+
+"filePath" is relative to the project root directory and where the snippet should be added.
+`;
 
   return `
 You are an expert Next.js full-stack developer.
