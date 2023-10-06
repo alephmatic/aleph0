@@ -47,7 +47,6 @@ async function generate(
 
   consola.log("Using snippet:", snippet, "\n");
 
-  // 2. Find the relevant files we are dealing with
   // For each snippet file, find the corresponding file to be created/modified
   // const changes = [{snippet: 'path', sourceFile: 'path'}]
   consola.info(`Step 2 - find the relevant files we are dealing with`);
@@ -85,7 +84,6 @@ async function generate(
   consola.log(changes);
   consola.log("\n");
 
-  // 3. For each file in the changes array, ask GPT 4 for the new file and create/modify it.
   const RELATIVE_DIR = "../examples/next";
   consola.info(
     `Step 3 - for each file in the changes array, ask GPT 4 for the new file and create/modify it.`
