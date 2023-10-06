@@ -1,9 +1,8 @@
 import { Command } from "commander";
-import { z } from "zod";
 import path from "path";
 import consola from "consola";
 import {
-  getKnowledge,
+  getGeneralAndRoutesKnowledge,
   getProjectStructure,
   loadSnippets,
   removeCodeWrapper,
@@ -17,7 +16,7 @@ import {
 } from "./prompts";
 import { ai } from "./openai";
 import { createFile, readFile } from "./lib/file";
-import { snippetSchema } from "./types";
+import { ChangesSchema, Snippet, changesSchema, snippetSchema } from "./types";
 
 async function generate(
   originalUserText: string,
@@ -25,17 +24,40 @@ async function generate(
 ) {
   consola.start("Creating:", originalUserText, "\n");
 
-  let userText = originalUserText;
+  const { knowledge, generalKnowledge, routesKnowledge } =
+    await getGeneralAndRoutesKnowledge("nextjs13");
 
-  if (regenerateDescription) {
-    consola.info(`Step 1a - create a cleaner task description`);
-    const regeneratedUserText = await ai(
-      createTaskDescriptionPrompt({ userText: originalUserText })
-    );
-    if (!regeneratedUserText) throw new Error(`AI didn't return a description`);
-    userText = regeneratedUserText;
-  }
+  const userText = await generateDescription(
+    originalUserText,
+    regenerateDescription
+  );
+  const snippet = await findRelevantSnippet(userText);
+  const changes = await findRelevantFiles(
+    snippet,
+    generalKnowledge,
+    routesKnowledge
+  );
+  const newFiles = await generateNewFiles(userText, changes, knowledge);
 
+  return newFiles;
+}
+
+async function generateDescription(
+  originalUserText: string,
+  regenerateDescription: boolean
+): Promise<string> {
+  if (!regenerateDescription) return originalUserText;
+
+  consola.info(`Step 1a - create a cleaner task description`);
+  const regeneratedUserText = await ai(
+    createTaskDescriptionPrompt({ userText: originalUserText })
+  );
+  if (!regeneratedUserText) throw new Error(`AI didn't return a description`);
+
+  return regeneratedUserText;
+}
+
+async function findRelevantSnippet(userText: string): Promise<Snippet> {
   consola.info(`Step 1b - find the relevant snippet`);
   const snippets = await loadSnippets();
   const snippetString = await ai(
@@ -44,21 +66,18 @@ async function generate(
   if (!snippetString) throw new Error(`AI didn't return a snippet`);
 
   const snippet = snippetSchema.parse(JSON.parse(snippetString));
+  return snippet;
+}
 
-  consola.log("Using snippet:", snippet, "\n");
-
+async function findRelevantFiles(
+  snippet: Snippet,
+  generalKnowledge: string,
+  routesKnowledge: string
+): Promise<ChangesSchema> {
   // For each snippet file, find the corresponding file to be created/modified
   // const changes = [{snippet: 'path', sourceFile: 'path'}]
   consola.info(`Step 2 - find the relevant files we are dealing with`);
   const projectStructure = await getProjectStructure("../examples/next");
-
-  // Find knowledge relevant to the files, that might help openai decide what and how to change files
-  const knowledge = await getKnowledge("nextjs13");
-  const generalKnowledge = knowledge["general.txt"];
-  const routesKnowledge = Object.keys(knowledge)
-    .filter((k) => k != "general.txt")
-    .map((k) => knowledge[k])
-    .join("\n");
 
   const changesRaw = await ai(
     await createChangesArrayPrompt({
@@ -73,21 +92,22 @@ async function generate(
   if (!changesRaw)
     throw new Error(`AI returned a bad changes array: ${snippet}`);
 
-  const changesSchema = z.array(
-    z.object({
-      snippetPath: z.string(),
-      sourcePath: z.string(),
-    })
-  );
   const changes = changesSchema.parse(JSON.parse(changesRaw));
 
-  consola.log(changes);
-  consola.log("\n");
+  return changes;
+}
 
+async function generateNewFiles(
+  userText: string,
+  changes: ChangesSchema,
+  knowledge: Record<string, string>
+) {
   const RELATIVE_DIR = "../examples/next";
+
   consola.info(
     `Step 3 - for each file in the changes array, ask GPT 4 for the new file and create/modify it.`
   );
+
   for (const change of changes) {
     consola.log(`Change operation: ${JSON.stringify(change, null, 2)}`);
 
@@ -133,7 +153,7 @@ program
   .description("Generate nextjs snippet.")
   .option(
     "-srd, --skip-regenerate-description",
-    "AI will skip regenerating the description",
+    "AI will skip regenerating the description"
   )
   .action((text, options) => {
     generate(text, !options.skipRegenerateDescription);

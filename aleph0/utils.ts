@@ -36,7 +36,7 @@ export async function getSnippetFiles(snippetPath: string) {
   return snippetFiles;
 }
 
-export async function getKnowledge(projectType: string) {
+async function getKnowledge(projectType: string) {
   const folderPath = `./knowledge/${projectType}`;
   const files = await fs.readdir(folderPath);
   const fileContents: { [key: string]: string } = {};
@@ -49,6 +49,20 @@ export async function getKnowledge(projectType: string) {
   }
 
   return fileContents;
+}
+
+/*
+Find knowledge relevant to the files, that might help openai decide what and how to change files
+*/
+export async function getGeneralAndRoutesKnowledge(projectType: string) {
+  const knowledge = await getKnowledge("nextjs13");
+  const generalKnowledge = knowledge["general.txt"];
+  const routesKnowledge = Object.keys(knowledge)
+    .filter((k) => k != "general.txt")
+    .map((k) => knowledge[k])
+    .join("\n");
+
+  return { knowledge, generalKnowledge, routesKnowledge };
 }
 
 /*
