@@ -113,7 +113,7 @@ async function generateNewFiles(
   for (const change of changes) {
     consola.log(`Change operation: ${JSON.stringify(change, null, 2)}`);
 
-    const sourceFilePath = path.join(PROJECT_DIR, change.sourcePath);
+    const sourceFilePath = path.join(PROJECT_DIR, change.filePath);
     const sourceFile = Bun.file(sourceFilePath);
     const snippet = readFile(change.snippetPath);
     const routeKnowledge =
