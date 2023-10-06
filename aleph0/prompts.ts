@@ -1,29 +1,29 @@
 import { Snippet } from "./types";
 import { getSnippetFiles } from "./utils";
 
-export const createTaskDescriptionPrompt = (options: { userText: string }) => {
-  const { userText } = options;
+export const createTaskDescriptionPrompt = (options: { userPrompt: string }) => {
+  const { userPrompt } = options;
 
   return `You are an expert full-stack developer.
 Create a more complete description of this task to pass on to an AI agent.
 The description should be kept to 1-2 lines if possible.
-${userText}
+${userPrompt}
   
 Task description:`;
 };
 
 export const findRelevantSnippetPrompt = (options: {
-  userText: string;
+  userPrompt: string;
   snippets: Snippet[];
 }) => {
-  const { userText, snippets } = options;
+  const { userPrompt, snippets } = options;
 
   return `
 Given the following snippets, in the following format per snippet: '{name} - {description} (path: {path})'\n
 ${JSON.stringify(snippets)}
 
 Output should be a valid json from snippets above.
-return the most relevant snippet above to achieve: "${userText}":\n`;
+return the most relevant snippet above to achieve: "${userPrompt}":\n`;
 };
 
 export const createChangesArrayPrompt = async (options: {
@@ -88,13 +88,13 @@ RULES:
 
 export const createFilePrompt = async (options: {
   snippet: string;
-  userText: string;
+  userPrompt: string;
   routeKnowledge: string;
 }) => {
-  const { snippet, userText, routeKnowledge } = options;
+  const { snippet, userPrompt, routeKnowledge } = options;
 
   return `You are an expert Next.js full-stack developer.
-You are following the user instructions to write code: ${userText}
+You are following the user instructions to write code: ${userPrompt}
 
 This is a snippet you need to change to generate the final code:
 ###
@@ -113,14 +113,14 @@ Final changed snippet code:
 
 export const updateFilePrompt = async (options: {
   snippet: string;
-  userText: string;
+  userPrompt: string;
   routeKnowledge: string;
   fileContents: string;
 }) => {
-  const { snippet, userText, routeKnowledge, fileContents } = options;
+  const { snippet, userPrompt, routeKnowledge, fileContents } = options;
 
   return `You are an expert Next.js full-stack developer.
-You are following the user instructions to write code: ${userText}
+You are following the user instructions to write code: ${userPrompt}
 
 This is a snippet you need to use to generate the final code:
 ###

@@ -19,49 +19,49 @@ import { createFile, readFile } from "./lib/file";
 import { ChangesSchema, Snippet, changesSchema, snippetSchema } from "./types";
 
 async function generate(
-  originalUserText: string,
+  originalUserPrompt: string,
   regenerateDescription: boolean
 ) {
-  consola.start("Creating:", originalUserText, "\n");
+  consola.start("Creating:", originalUserPrompt, "\n");
 
   const { knowledge, generalKnowledge, routesKnowledge } =
     await getGeneralAndRoutesKnowledge("nextjs13");
 
-  const userText = await generateDescription(
-    originalUserText,
+  const userPrompt = await generateDescription(
+    originalUserPrompt,
     regenerateDescription
   );
-  const snippet = await findRelevantSnippet(userText);
+  const snippet = await findRelevantSnippet(userPrompt);
   const changes = await findRelevantFiles(
     snippet,
     generalKnowledge,
     routesKnowledge
   );
-  const newFiles = await generateNewFiles(userText, changes, knowledge);
+  const newFiles = await generateNewFiles(userPrompt, changes, knowledge);
 
   return newFiles;
 }
 
 async function generateDescription(
-  originalUserText: string,
+  originalUserPrompt: string,
   regenerateDescription: boolean
 ): Promise<string> {
-  if (!regenerateDescription) return originalUserText;
+  if (!regenerateDescription) return originalUserPrompt;
 
   consola.info(`Step 1a - create a cleaner task description`);
-  const regeneratedUserText = await ai(
-    createTaskDescriptionPrompt({ userText: originalUserText })
+  const regeneratedUserPrompt = await ai(
+    createTaskDescriptionPrompt({ userPrompt: originalUserPrompt })
   );
-  if (!regeneratedUserText) throw new Error(`AI didn't return a description`);
+  if (!regeneratedUserPrompt) throw new Error(`AI didn't return a description`);
 
-  return regeneratedUserText;
+  return regeneratedUserPrompt;
 }
 
-async function findRelevantSnippet(userText: string): Promise<Snippet> {
+async function findRelevantSnippet(userPrompt: string): Promise<Snippet> {
   consola.info(`Step 1b - find the relevant snippet`);
   const snippets = await loadSnippets();
   const snippetString = await ai(
-    findRelevantSnippetPrompt({ userText, snippets })
+    findRelevantSnippetPrompt({ userPrompt, snippets })
   );
   if (!snippetString) throw new Error(`AI didn't return a snippet`);
 
@@ -98,7 +98,7 @@ async function findRelevantFiles(
 }
 
 async function generateNewFiles(
-  userText: string,
+  userPrompt: string,
   changes: ChangesSchema,
   knowledge: Record<string, string>
 ) {
@@ -124,7 +124,7 @@ async function generateNewFiles(
       fileContents = await ai(
         await updateFilePrompt({
           snippet,
-          userText,
+          userPrompt,
           routeKnowledge,
           fileContents: currentFileContents,
         }),
@@ -134,7 +134,7 @@ async function generateNewFiles(
     } else {
       consola.info("Creating a new file");
       fileContents = await ai(
-        await createFilePrompt({ snippet, userText, routeKnowledge }),
+        await createFilePrompt({ snippet, userPrompt, routeKnowledge }),
         undefined,
         "gpt-4"
       );
