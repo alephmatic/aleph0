@@ -2,7 +2,6 @@ import { Command } from "commander";
 import path from "path";
 import consola from "consola";
 import {
-  // getGeneralAndRoutesKnowledge,
   getProjectStructure,
   loadSnippets,
   removeCodeWrapper,
@@ -32,9 +31,6 @@ async function generate(
 ) {
   consola.start("Creating:", originalUserPrompt, "\n");
 
-  // const { knowledge, generalKnowledge, routesKnowledge } =
-  //   await getGeneralAndRoutesKnowledge("nextjs13");
-
   const userPrompt = await generateDescription(
     originalUserPrompt,
     regenerateDescription
@@ -43,8 +39,6 @@ async function generate(
   const changes = await findProjectFiles({
     userPrompt,
     snippetMetadata,
-    // generalKnowledge,
-    // routesKnowledge
   });
   const newFiles = await generateNewFiles(userPrompt, changes);
 
@@ -83,8 +77,6 @@ async function chooseSnippet(userPrompt: string): Promise<SnippetMetadata> {
 async function findProjectFiles(options: {
   userPrompt: string;
   snippetMetadata: SnippetMetadata;
-  // generalKnowledge: string,
-  // routesKnowledge: string
 }): Promise<ChangeFilesSchemaWithSnippet> {
   consola.info(`Step 2 - find the project files to edit`);
   const { userPrompt, snippetMetadata } = options;
@@ -95,8 +87,6 @@ async function findProjectFiles(options: {
       userPrompt,
       snippetMetadata,
       projectStructure,
-      // generalKnowledge,
-      // routesKnowledge,
     }),
     "Find what files are relevant for these snippets in this project.",
     "gpt-4"

@@ -1,5 +1,4 @@
 import { SnippetMetadata } from "./types";
-import { getSnippetFiles } from "./utils";
 
 export const createTaskDescriptionPrompt = (options: {
   userPrompt: string;
@@ -32,8 +31,6 @@ export const chooseFilePathsPrompt = async (options: {
   userPrompt: string;
   snippetMetadata: SnippetMetadata;
   projectStructure: string;
-  // generalKnowledge: string;
-  // routesKnowledge: string;
 }) => {
   const { userPrompt, snippetMetadata, projectStructure } = options;
 
@@ -65,49 +62,6 @@ Return a JSON array in the following format:
 This is the current file tree of the project:
 ${projectStructure}
 `;
-
-  // const snippetFiles: string[] = await getSnippetFiles(snippet.path);
-
-  //   return `
-  // You are an expert Next.js full-stack developer.
-  // ${generalKnowledge}
-
-  // Your project has the following structure:
-  // ###
-  // ${projectStructure}
-  // ###
-
-  // You are given the following snippet files:
-  // ###
-  // ${snippetFiles.join("\n")}
-  // ###
-
-  // You have received the following documentation:
-  // ${routesKnowledge}
-
-  // Return the snippets and relative source files to create/modify.
-
-  // Rules:
-  // - Valid JSON array, no explanations or descriptions.
-  // - If the file needs to be created, think about the most appropriate path and file name.
-  // - snippetPath and sourcePath have to have the same file name (e.g. snippetPath="route.ts", then sourcePath must be a file named the same: "route.ts")
-  // - Output in the following format example:
-  //   [{snippetPath: "snippets/search-handler/route.ts", sourcePath: "app/search/route.ts"]
-  // - DO NOT USE THE FOLLOWING PATHS as sourcePaths:
-  // components/
-  //   ui/
-  //     form.tsx
-  //     label.tsx
-  //     toaster.tsx
-  //     use-toast.ts
-  //     input.tsx
-  //     select.tsx
-  //     button.tsx
-  //     table.tsx
-  //     toast.tsx
-
-  // JSON result:
-  //   `;
 };
 
 const CODE_GEN_RULES = `
