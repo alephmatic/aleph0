@@ -2,7 +2,7 @@ import { Command } from "commander";
 import path from "path";
 import consola from "consola";
 import {
-  getGeneralAndRoutesKnowledge,
+  // getGeneralAndRoutesKnowledge,
   getProjectStructure,
   loadSnippets,
   removeCodeWrapper,
@@ -10,13 +10,19 @@ import {
 import {
   createTaskDescriptionPrompt,
   findRelevantSnippetPrompt,
-  createChangesArrayPrompt,
+  chooseFilePathsPrompt,
   createFilePrompt,
   updateFilePrompt,
 } from "./prompts";
 import { ai } from "./openai";
 import { createFile, readFile } from "./lib/file";
-import { ChangesSchema, Snippet, changesSchema, snippetSchema } from "./types";
+import {
+  snippetMetadataSchema,
+  type SnippetMetadata,
+  changeFilesSchema,
+  type ChangeFilesSchemaWithSnippet,
+  isDefined,
+} from "./types";
 
 const PROJECT_DIR = "../examples/next";
 
@@ -26,22 +32,21 @@ async function generate(
 ) {
   consola.start("Creating:", originalUserPrompt, "\n");
 
-  const { knowledge, generalKnowledge, routesKnowledge } =
-    await getGeneralAndRoutesKnowledge("nextjs13");
+  // const { knowledge, generalKnowledge, routesKnowledge } =
+  //   await getGeneralAndRoutesKnowledge("nextjs13");
 
   const userPrompt = await generateDescription(
     originalUserPrompt,
     regenerateDescription
   );
-  const snippet = await chooseSnippet(userPrompt);
-  const changes = await findProjectFiles(
+  const snippetMetadata = await chooseSnippet(userPrompt);
+  const changes = await findProjectFiles({
     userPrompt,
-    snippet,
-    generalKnowledge,
-    routesKnowledge
-  );
-  return // TODO remove
-  const newFiles = await generateNewFiles(userPrompt, changes, knowledge);
+    snippetMetadata,
+    // generalKnowledge,
+    // routesKnowledge
+  });
+  const newFiles = await generateNewFiles(userPrompt, changes);
 
   return newFiles;
 }
@@ -61,7 +66,7 @@ async function generateDescription(
   return regeneratedUserPrompt;
 }
 
-async function chooseSnippet(userPrompt: string): Promise<Snippet> {
+async function chooseSnippet(userPrompt: string): Promise<SnippetMetadata> {
   consola.info(`Step 1b - choose the snippet to use for this task`);
   const snippets = await loadSnippets();
   const snippetString = await ai(
@@ -69,55 +74,77 @@ async function chooseSnippet(userPrompt: string): Promise<Snippet> {
   );
   if (!snippetString) throw new Error(`AI didn't return a snippet`);
 
-  const snippet = snippetSchema.parse(JSON.parse(snippetString));
-  return snippet;
+  const snippetMetadata = snippetMetadataSchema.parse(
+    JSON.parse(snippetString)
+  );
+  return snippetMetadata;
 }
 
-async function findProjectFiles(
-  userPrompt: string,
-  snippet: Snippet,
-  generalKnowledge: string,
-  routesKnowledge: string
-): Promise<ChangesSchema> {
+async function findProjectFiles(options: {
+  userPrompt: string;
+  snippetMetadata: SnippetMetadata;
+  // generalKnowledge: string,
+  // routesKnowledge: string
+}): Promise<ChangeFilesSchemaWithSnippet> {
   consola.info(`Step 2 - find the project files to edit`);
+  const { userPrompt, snippetMetadata } = options;
   const projectStructure = await getProjectStructure(PROJECT_DIR);
 
-  const changesRaw = await ai(
-    await createChangesArrayPrompt({
+  const chooseFilePathsRaw = await ai(
+    await chooseFilePathsPrompt({
       userPrompt,
-      snippet,
+      snippetMetadata,
       projectStructure,
-      generalKnowledge,
-      routesKnowledge,
+      // generalKnowledge,
+      // routesKnowledge,
     }),
     "Find what files are relevant for these snippets in this project.",
     "gpt-4"
   );
-  if (!changesRaw)
-    throw new Error(`AI returned a bad changes array: ${snippet}`);
+  if (!chooseFilePathsRaw)
+    throw new Error(`AI returned a bad changes array: ${snippetMetadata}`);
 
-  const changes = changesSchema.parse(JSON.parse(changesRaw));
+  const changes = changeFilesSchema.parse(JSON.parse(chooseFilePathsRaw));
 
-  return changes;
+  const changesWithSnippets = changes
+    .map((change) => {
+      const snippet = snippetMetadata.snippets.find(
+        (snippet) => snippet.name === change.snippetName
+      );
+      if (!snippet) {
+        consola.warn(`Snippet not found: ${change.snippetName}`);
+        return;
+      }
+
+      return {
+        ...change,
+        snippet,
+      };
+    })
+    .filter(isDefined);
+
+  return changesWithSnippets;
 }
 
 async function generateNewFiles(
   userPrompt: string,
-  changes: ChangesSchema,
-  knowledge: Record<string, string>
+  fileChanges: ChangeFilesSchemaWithSnippet
 ) {
   consola.info(
-    `Step 3 - for each file in the changes array, ask GPT 4 for the new file and create/modify it.`
+    `Step 3 - for each file in the changes array, ask the AI for the new file and create/modify it.`
   );
 
-  for (const change of changes) {
-    consola.log(`Change operation: ${JSON.stringify(change, null, 2)}`);
+  for (const fileChange of fileChanges) {
+    consola.log(`Change operation: ${JSON.stringify(fileChange, null, 2)}`);
 
-    const sourceFilePath = path.join(PROJECT_DIR, change.filePath);
+    const sourceFilePath = path.join(PROJECT_DIR, fileChange.filePath);
     const sourceFile = Bun.file(sourceFilePath);
-    const snippet = readFile(change.snippetPath);
-    const routeKnowledge =
-      knowledge[change.snippetPath.split("/").at(-1) || ""]; // TODO fix this
+
+    const snippet = readFile(fileChange.snippet.file);
+
+    const snippetKnowledge = fileChange.snippet.knowledgeFiles
+      .map((file) => readFile(`./knowledge/${file}`))
+      .join("\n\n");
 
     let fileContents;
     if (await sourceFile.exists()) {
@@ -127,7 +154,7 @@ async function generateNewFiles(
         await updateFilePrompt({
           snippet,
           userPrompt,
-          routeKnowledge,
+          snippetKnowledge,
           fileContents: currentFileContents,
         }),
         undefined,
@@ -136,7 +163,7 @@ async function generateNewFiles(
     } else {
       consola.info("Creating a new file");
       fileContents = await ai(
-        await createFilePrompt({ snippet, userPrompt, routeKnowledge }),
+        await createFilePrompt({ snippet, userPrompt, snippetKnowledge }),
         undefined,
         "gpt-4"
       );
