@@ -62,7 +62,7 @@ async function getKnowledge(projectType: string) {
 Find knowledge relevant to the files, that might help openai decide what and how to change files
 */
 export async function getGeneralAndRoutesKnowledge(projectType: string) {
-  const knowledge = await getKnowledge("nextjs13");
+  const knowledge = await getKnowledge("nextjs13_4");
   const generalKnowledge = knowledge["general.txt"];
   const routesKnowledge = Object.keys(knowledge)
     .filter((k) => k != "general.txt")
