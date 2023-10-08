@@ -22,21 +22,14 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
 import { postRequest } from "@/lib/api";
+// change this to the appropriate route
 import { userProfileBody, UserProfileBody } from "@/app/api/user/settings/validation";
-
-// this zod schema is defined in "@/api/user/settings/validation"
-// const userProfileSchema = z.object({
-//   username: z.string().min(2, {
-//     message: "Username must be at least 2 characters.",
-//   }),
-//   email: z.string().email(),
-//   city: z.enum(["London", "New York", "Tokyo"]),
-// });
 
 export function ProfileForm() {
   const { toast } = useToast();
 
   const form = useForm<UserProfileBody>({
+    // "userProfileBody" is a zod schema defined in "@/api/user/settings/validation"
     resolver: zodResolver(userProfileBody),
     defaultValues: {
       username: "",
