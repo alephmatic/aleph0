@@ -1,11 +1,7 @@
 import { Command } from "commander";
 import path from "path";
 import consola from "consola";
-import {
-  getProjectStructure,
-  loadSnippets,
-  removeCodeWrapper,
-} from "./utils";
+import { getProjectStructure, loadSnippets, removeCodeWrapper } from "./utils";
 import {
   createTaskDescriptionPrompt,
   findRelevantSnippetPrompt,
@@ -40,7 +36,7 @@ async function generate(
     userPrompt,
     snippetMetadata,
   });
-  const newFiles = await generateNewFiles(userPrompt, changes);
+  const newFiles = await generateNewFiles(userPrompt, snippetMetadata, changes);
 
   return newFiles;
 }
@@ -118,6 +114,7 @@ async function findProjectFiles(options: {
 
 async function generateNewFiles(
   userPrompt: string,
+  snippetMetadata: SnippetMetadata,
   fileChanges: ChangeFilesSchemaWithSnippet
 ) {
   consola.info(
@@ -130,10 +127,12 @@ async function generateNewFiles(
     const sourceFilePath = path.join(PROJECT_DIR, fileChange.filePath);
     const sourceFile = Bun.file(sourceFilePath);
 
-    const snippet = readFile(fileChange.snippet.file);
+    const snippet = readFile(
+      `./snippets/${snippetMetadata.path}/${fileChange.snippet.file}`
+    );
 
     const snippetKnowledge = fileChange.snippet.knowledgeFiles
-      .map((file) => readFile(`./knowledge/${file}`))
+      .map((file) => readFile(`./knowledge/nextjs13_4/${file}`))
       .join("\n\n");
 
     let fileContents;

@@ -59,6 +59,9 @@ Return a JSON array in the following format:
 
 "filePath" is relative to the project root directory and where the snippet should be added.
 
+DO NOT PLACE FILES IN COMPONENTS/UI FOLDER. CREATE NEW FILES.
+DO NOT EXPLAIN YOUR DECISIONS, ONLY RETURN A VALID JSON ARRAY.
+
 This is the current file tree of the project:
 ${projectStructure}
 `;
