@@ -1,103 +1,139 @@
 import { Command } from "commander";
-import { z } from "zod";
 import path from "path";
 import consola from "consola";
-import {
-  getKnowledge,
-  getProjectStructure,
-  loadSnippets,
-  removeCodeWrapper,
-} from "./utils";
+import { getProjectStructure, loadSnippets, removeCodeWrapper } from "./utils";
 import {
   createTaskDescriptionPrompt,
   findRelevantSnippetPrompt,
-  createChangesArrayPrompt,
+  chooseFilePathsPrompt,
   createFilePrompt,
   updateFilePrompt,
 } from "./prompts";
 import { ai } from "./openai";
 import { createFile, readFile } from "./lib/file";
-import { snippetSchema } from "./types";
+import {
+  snippetMetadataSchema,
+  type SnippetMetadata,
+  changeFilesSchema,
+  type ChangeFilesSchemaWithSnippet,
+  isDefined,
+} from "./types";
+
+const PROJECT_DIR = "../examples/next";
 
 async function generate(
-  originalUserText: string,
+  originalUserPrompt: string,
   regenerateDescription: boolean
 ) {
-  consola.start("Creating:", originalUserText, "\n");
+  consola.start("Creating:", originalUserPrompt, "\n");
 
-  let userText = originalUserText;
+  const userPrompt = await generateDescription(
+    originalUserPrompt,
+    regenerateDescription
+  );
+  const snippetMetadata = await chooseSnippet(userPrompt);
+  const changes = await findProjectFiles({
+    userPrompt,
+    snippetMetadata,
+  });
+  const newFiles = await generateNewFiles(userPrompt, snippetMetadata, changes);
 
-  if (regenerateDescription) {
-    consola.info(`Step 1a - create a cleaner task description`);
-    const regeneratedUserText = await ai(
-      createTaskDescriptionPrompt({ userText: originalUserText })
-    );
-    if (!regeneratedUserText) throw new Error(`AI didn't return a description`);
-    userText = regeneratedUserText;
-  }
+  return newFiles;
+}
 
-  consola.info(`Step 1b - find the relevant snippet`);
+async function generateDescription(
+  originalUserPrompt: string,
+  regenerateDescription: boolean
+): Promise<string> {
+  if (!regenerateDescription) return originalUserPrompt;
+
+  consola.info(`Step 1a - create a cleaner task description`);
+  const regeneratedUserPrompt = await ai(
+    createTaskDescriptionPrompt({ userPrompt: originalUserPrompt })
+  );
+  if (!regeneratedUserPrompt) throw new Error(`AI didn't return a description`);
+
+  return regeneratedUserPrompt;
+}
+
+async function chooseSnippet(userPrompt: string): Promise<SnippetMetadata> {
+  consola.info(`Step 1b - choose the snippet to use for this task`);
   const snippets = await loadSnippets();
   const snippetString = await ai(
-    findRelevantSnippetPrompt({ userText, snippets })
+    findRelevantSnippetPrompt({ userPrompt, snippets })
   );
   if (!snippetString) throw new Error(`AI didn't return a snippet`);
 
-  const snippet = snippetSchema.parse(JSON.parse(snippetString));
+  const snippetMetadata = snippetMetadataSchema.parse(
+    JSON.parse(snippetString)
+  );
+  return snippetMetadata;
+}
 
-  consola.log("Using snippet:", snippet, "\n");
+async function findProjectFiles(options: {
+  userPrompt: string;
+  snippetMetadata: SnippetMetadata;
+}): Promise<ChangeFilesSchemaWithSnippet> {
+  consola.info(`Step 2 - find the project files to edit`);
+  const { userPrompt, snippetMetadata } = options;
+  const projectStructure = await getProjectStructure(PROJECT_DIR);
 
-  // 2. Find the relevant files we are dealing with
-  // For each snippet file, find the corresponding file to be created/modified
-  // const changes = [{snippet: 'path', sourceFile: 'path'}]
-  consola.info(`Step 2 - find the relevant files we are dealing with`);
-  const projectStructure = await getProjectStructure("../examples/next");
-
-  // Find knowledge relevant to the files, that might help openai decide what and how to change files
-  const knowledge = await getKnowledge("nextjs13");
-  const generalKnowledge = knowledge["general.txt"];
-  const routesKnowledge = Object.keys(knowledge)
-    .filter((k) => k != "general.txt")
-    .map((k) => knowledge[k])
-    .join("\n");
-
-  const changesRaw = await ai(
-    await createChangesArrayPrompt({
-      snippet,
+  const chooseFilePathsRaw = await ai(
+    await chooseFilePathsPrompt({
+      userPrompt,
+      snippetMetadata,
       projectStructure,
-      generalKnowledge,
-      routesKnowledge,
     }),
     "Find what files are relevant for these snippets in this project.",
     "gpt-4"
   );
-  if (!changesRaw)
-    throw new Error(`AI returned a bad changes array: ${snippet}`);
+  if (!chooseFilePathsRaw)
+    throw new Error(`AI returned a bad changes array: ${snippetMetadata}`);
 
-  const changesSchema = z.array(
-    z.object({
-      snippetPath: z.string(),
-      sourcePath: z.string(),
+  const changes = changeFilesSchema.parse(JSON.parse(chooseFilePathsRaw));
+
+  const changesWithSnippets = changes
+    .map((change) => {
+      const snippet = snippetMetadata.snippets.find(
+        (snippet) => snippet.name === change.snippetName
+      );
+      if (!snippet) {
+        consola.warn(`Snippet not found: ${change.snippetName}`);
+        return;
+      }
+
+      return {
+        ...change,
+        snippet,
+      };
     })
-  );
-  const changes = changesSchema.parse(JSON.parse(changesRaw));
+    .filter(isDefined);
 
-  consola.log(changes);
-  consola.log("\n");
+  return changesWithSnippets;
+}
 
-  // 3. For each file in the changes array, ask GPT 4 for the new file and create/modify it.
-  const RELATIVE_DIR = "../examples/next";
+async function generateNewFiles(
+  userPrompt: string,
+  snippetMetadata: SnippetMetadata,
+  fileChanges: ChangeFilesSchemaWithSnippet
+) {
   consola.info(
-    `Step 3 - for each file in the changes array, ask GPT 4 for the new file and create/modify it.`
+    `Step 3 - for each file in the changes array, ask the AI for the new file and create/modify it.`
   );
-  for (const change of changes) {
-    consola.log(`Change operation: ${JSON.stringify(change, null, 2)}`);
 
-    const sourceFilePath = path.join(RELATIVE_DIR, change.sourcePath);
+  for (const fileChange of fileChanges) {
+    consola.log(`Change operation: ${JSON.stringify(fileChange, null, 2)}`);
+
+    const sourceFilePath = path.join(PROJECT_DIR, fileChange.filePath);
     const sourceFile = Bun.file(sourceFilePath);
-    const snippet = readFile(change.snippetPath);
-    const routeKnowledge =
-      knowledge[change.snippetPath.split("/").at(-1) || ""]; // TODO fix this
+
+    const snippet = readFile(
+      `./snippets/${snippetMetadata.path}/${fileChange.snippet.file}`
+    );
+
+    const snippetKnowledge = fileChange.snippet.knowledgeFiles
+      .map((file) => readFile(`./knowledge/nextjs13_4/${file}`))
+      .join("\n\n");
 
     let fileContents;
     if (await sourceFile.exists()) {
@@ -106,8 +142,8 @@ async function generate(
       fileContents = await ai(
         await updateFilePrompt({
           snippet,
-          userText,
-          routeKnowledge,
+          userPrompt,
+          snippetKnowledge,
           fileContents: currentFileContents,
         }),
         undefined,
@@ -116,7 +152,7 @@ async function generate(
     } else {
       consola.info("Creating a new file");
       fileContents = await ai(
-        await createFilePrompt({ snippet, userText, routeKnowledge }),
+        await createFilePrompt({ snippet, userPrompt, snippetKnowledge }),
         undefined,
         "gpt-4"
       );
@@ -135,7 +171,7 @@ program
   .description("Generate nextjs snippet.")
   .option(
     "-srd, --skip-regenerate-description",
-    "AI will skip regenerating the description",
+    "AI will skip regenerating the description"
   )
   .action((text, options) => {
     generate(text, !options.skipRegenerateDescription);

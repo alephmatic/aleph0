@@ -1,25 +1,32 @@
 import fs from "fs/promises";
 import path from "path";
 import consola from "consola";
-import { Snippet } from "./types";
+import { SnippetMetadata } from "./types";
+import { readFile } from "./lib/file";
 
 /*
 Finds all of the metadata.json files in the snippets directory returns json array
 */
-export async function loadSnippets(): Promise<Snippet[]> {
+export async function loadSnippets(): Promise<SnippetMetadata[]> {
   const snippetsDir = "./snippets";
   const snippetDirs = await fs.readdir(snippetsDir, { withFileTypes: true });
   const metadataFiles = await Promise.all(
     snippetDirs
       .filter((dir) => dir.isDirectory())
       .map((dir) => path.join(snippetsDir, dir.name, "metadata.json"))
-      .map((metadataPath) => fs.readFile(metadataPath, "utf-8"))
+      .map((metadataPath) => readFile(metadataPath))
   );
   const metadataObjects = metadataFiles
     .map((metadata) => metadata.replace(/[\n]/g, "").replace(/\s\s/g, ""))
     .map((metadata) => JSON.parse(metadata));
 
   return metadataObjects;
+}
+
+export async function getSnippetFile(snippetsDir: string, snippetFile: string) {
+  const path = `./snippets/${snippetsDir}/${snippetFile}`;
+  const fileContents = readFile(path);
+  return fileContents;
 }
 
 export async function getSnippetFiles(snippetPath: string) {
@@ -36,7 +43,7 @@ export async function getSnippetFiles(snippetPath: string) {
   return snippetFiles;
 }
 
-export async function getKnowledge(projectType: string) {
+async function getKnowledge(projectType: string) {
   const folderPath = `./knowledge/${projectType}`;
   const files = await fs.readdir(folderPath);
   const fileContents: { [key: string]: string } = {};
@@ -44,11 +51,25 @@ export async function getKnowledge(projectType: string) {
   for (const file of files) {
     const fileName = file;
     const filePath = `${folderPath}/${file}`;
-    const content = await fs.readFile(filePath, "utf-8");
+    const content = readFile(filePath);
     fileContents[fileName] = content;
   }
 
   return fileContents;
+}
+
+/*
+Find knowledge relevant to the files, that might help openai decide what and how to change files
+*/
+export async function getGeneralAndRoutesKnowledge(projectType: string) {
+  const knowledge = await getKnowledge("nextjs13_4");
+  const generalKnowledge = knowledge["general.txt"];
+  const routesKnowledge = Object.keys(knowledge)
+    .filter((k) => k != "general.txt")
+    .map((k) => knowledge[k])
+    .join("\n");
+
+  return { knowledge, generalKnowledge, routesKnowledge };
 }
 
 /*

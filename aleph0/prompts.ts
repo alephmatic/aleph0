@@ -1,82 +1,70 @@
-import { Snippet } from "./types";
-import { getSnippetFiles } from "./utils";
+import { SnippetMetadata } from "./types";
 
-export const createTaskDescriptionPrompt = (options: { userText: string }) => {
-  const { userText } = options;
+export const createTaskDescriptionPrompt = (options: {
+  userPrompt: string;
+}) => {
+  const { userPrompt } = options;
 
   return `You are an expert full-stack developer.
 Create a more complete description of this task to pass on to an AI agent.
 The description should be kept to 1-2 lines if possible.
-${userText}
+${userPrompt}
   
 Task description:`;
 };
 
 export const findRelevantSnippetPrompt = (options: {
-  userText: string;
-  snippets: Snippet[];
+  userPrompt: string;
+  snippets: SnippetMetadata[];
 }) => {
-  const { userText, snippets } = options;
+  const { userPrompt, snippets } = options;
 
   return `
 Given the following snippets, in the following format per snippet: '{name} - {description} (path: {path})'\n
 ${JSON.stringify(snippets)}
 
 Output should be a valid json from snippets above.
-return the most relevant snippet above to achieve: "${userText}":\n`;
+return the most relevant snippet above to achieve: "${userPrompt}":\n`;
 };
 
-export const createChangesArrayPrompt = async (options: {
-  snippet: Snippet;
+export const chooseFilePathsPrompt = async (options: {
+  userPrompt: string;
+  snippetMetadata: SnippetMetadata;
   projectStructure: string;
-  generalKnowledge: string;
-  routesKnowledge: string;
 }) => {
-  const { snippet, projectStructure, generalKnowledge, routesKnowledge } =
-    options;
+  const { userPrompt, snippetMetadata, projectStructure } = options;
 
-  const snippets: string[] = await getSnippetFiles(snippet.path);
+  return `You are an expert Next.js full-stack developer.
 
-  return `
-You are an expert Next.js full-stack developer.
-${generalKnowledge}
+Your feedback is needed to create a new feature in the app:
+"${userPrompt}"
 
-Your project has the following structure:
-###
+You are given a collection of snippets to add to a project.
+
+A general description of the snippets:
+${snippetMetadata.description}
+
+The snippets:
+${JSON.stringify(snippetMetadata, null, 2)}
+
+Placeholders are surrounded with < and >. Replace placeholders with the correct values.",
+
+It is your job to choose the relative paths for where these snippets should be added to the project.
+
+Return a JSON array in the following format:
+[
+  { "snippetName": "SNIPPET_NAME_1", "filePath": "PATH_1" },
+  { "snippetName": "SNIPPET_NAME_2", "filePath": "PATH_2" }
+]
+
+"filePath" is relative to the project root directory and where the snippet should be added.
+
+DO NOT PLACE FILES IN COMPONENTS/UI FOLDER. CREATE NEW FILES.
+DO NOT EXPLAIN YOUR DECISIONS, ONLY RETURN A VALID JSON ARRAY.
+
+This is the current file tree of the project:
 ${projectStructure}
-###
-
-You are given the following snippet files:
-###
-${snippets.join("\n")}
-###
-
-You have received the following documentation:
-${routesKnowledge}
-
-Return the snippets and relative source files to create/modify.
-
-Rules:
-- Valid JSON array, no explanations or descriptions.
-- If the file needs to be created, think about the most appropriate path and file name.
-- snippetPath and sourcePath have to have the same file name (e.g. snippetPath="route.ts", then sourcePath must be a file named the same: "route.ts")
-- Output in the following format example:
-  [{snippetPath: "snippets/search-handler/route.ts", sourcePath: "app/search/route.ts"]
-- DO NOT USE THE FOLLOWING PATHS as sourcePaths:
-components/
-  ui/
-    form.tsx
-    label.tsx
-    toaster.tsx
-    use-toast.ts
-    input.tsx
-    select.tsx
-    button.tsx
-    table.tsx
-    toast.tsx
-
-JSON result:
-  `;
+`;
 };
 
 const CODE_GEN_RULES = `
@@ -88,13 +76,13 @@ RULES:
 
 export const createFilePrompt = async (options: {
   snippet: string;
-  userText: string;
-  routeKnowledge: string;
+  userPrompt: string;
+  snippetKnowledge: string;
 }) => {
-  const { snippet, userText, routeKnowledge } = options;
+  const { snippet, userPrompt, snippetKnowledge } = options;
 
   return `You are an expert Next.js full-stack developer.
-You are following the user instructions to write code: ${userText}
+You are following the user instructions to write code: ${userPrompt}
 
 This is a snippet you need to change to generate the final code:
 ###
@@ -102,7 +90,7 @@ ${snippet}
 ###
 
 Additional knowledge that can help you:
-${routeKnowledge}
+${snippetKnowledge}
 
 ${CODE_GEN_RULES}
 
@@ -113,14 +101,14 @@ Final changed snippet code:
 
 export const updateFilePrompt = async (options: {
   snippet: string;
-  userText: string;
-  routeKnowledge: string;
+  userPrompt: string;
+  snippetKnowledge: string;
   fileContents: string;
 }) => {
-  const { snippet, userText, routeKnowledge, fileContents } = options;
+  const { snippet, userPrompt, snippetKnowledge, fileContents } = options;
 
   return `You are an expert Next.js full-stack developer.
-You are following the user instructions to write code: ${userText}
+You are following the user instructions to write code: ${userPrompt}
 
 This is a snippet you need to use to generate the final code:
 ###
@@ -128,7 +116,7 @@ ${snippet}
 ###
 
 Additional knowledge that can help you:
-${routeKnowledge}
+${snippetKnowledge}
 
 Update this code, using the information and snippet above:
 ###
