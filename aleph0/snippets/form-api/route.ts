@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { userProfileBody } from "@/api/user/settings/validation";
+import { userProfileBody } from "@/app/api/user/settings/validation";
 
 // update user profile API route
 export const POST = async (request: Request) => {
