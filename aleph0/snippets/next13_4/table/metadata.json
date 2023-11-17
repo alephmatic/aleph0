@@ -7,7 +7,7 @@
       "name": "TABLE",
       "file": "table.tsx",
       "explanation": "The table should be placed on the frontend in a `tables/<TABLE>.ts` file.",
-      "generalSnippetReference": ["page.tsx"]
+      "references": ["page.tsx"]
     }
   ]
 }

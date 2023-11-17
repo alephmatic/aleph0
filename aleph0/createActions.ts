@@ -39,7 +39,8 @@ export const createActions = () => {
         return { snippets: await loadSnippets(args.technology) };
       },
       name: "getSnippets",
-      description: "Returns the snippets for a given technology (next13...).",
+      description:
+        "Returns the snippets for a given technology ('next13_4'...).",
       parse: (args: string) => {
         return z
           .object({

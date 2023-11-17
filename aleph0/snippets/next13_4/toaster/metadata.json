@@ -7,7 +7,7 @@
       "name": "TOASTER",
       "file": "table.tsx",
       "explanation": "The toaster should be placed on the frontend in a `toasters/<TOASTER>.ts` file.",
-      "generalSnippetReference": ["page.tsx"]
+      "references": ["page.tsx"]
     }
   ]
 }

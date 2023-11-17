@@ -7,19 +7,19 @@
       "name": "FORM",
       "file": "form.tsx",
       "explanation": "The form should be placed on the frontend in a `forms/<FORM>.ts` file.",
-      "generalSnippetReference": ["page.tsx"]
+      "references": ["page.tsx"]
     },
     {
       "name": "ROUTE",
       "file": "route.ts",
       "explanation": "The `route.ts` file should be placed at `app/api/<FEATURE>/route.ts`. This can be imported as import '@/app/api/<FEATURE>/route.ts'.",
-      "generalSnippetReference": ["route.ts"]
+      "references": ["route.ts"]
     },
     {
       "name": "VALIDATION",
       "file": "validation.ts",
       "explanation": "The `validation.ts` file should be placed at `app/api/<FEATURE>/validation.ts`. This can be imported as import '@/app/api/<FEATURE>/validation.ts'.",
-      "generalSnippetReference": []
+      "references": []
     }
   ]
 }
