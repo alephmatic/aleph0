@@ -1,26 +1,46 @@
 import fs from "fs/promises";
 import path from "path";
 import consola from "consola";
-import { SnippetMetadata } from "./types";
+import { TechnologySnippets, Technology, Snippet } from "./types";
 import { readFile } from "./lib/file";
+
+function capitalize(string: string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
 
 /*
 Finds all of the metadata.json files in the snippets directory returns json array
 */
-export async function loadSnippets(): Promise<SnippetMetadata[]> {
-  const snippetsDir = "./snippets";
+export async function loadSnippets(
+  technology: Technology
+): Promise<TechnologySnippets> {
+  const snippetsDir = path.join("./snippets", technology);
   const snippetDirs = await fs.readdir(snippetsDir, { withFileTypes: true });
-  const metadataFiles = await Promise.all(
+
+  // Files directly under the technology are general snippets.
+  const technologyGeneralSnippets: Snippet[] = snippetDirs
+    .filter((fd) => fd.isFile())
+    .map((fd) => ({
+      name: capitalize(fd.name),
+      file: fd.name,
+      explanation: `Details about ${fd.name} files when using ${technology}.`,
+    }));
+
+  // Snippets are directories with a metadata.json file.
+  const snippetsData = await Promise.all(
     snippetDirs
       .filter((dir) => dir.isDirectory())
       .map((dir) => path.join(snippetsDir, dir.name, "metadata.json"))
       .map((metadataPath) => readFile(metadataPath))
   );
-  const metadataObjects = metadataFiles
+  const technologySnippets: Snippet[] = snippetsData
     .map((metadata) => metadata.replace(/[\n]/g, "").replace(/\s\s/g, ""))
     .map((metadata) => JSON.parse(metadata));
 
-  return metadataObjects;
+  return {
+    generalSnippets: technologyGeneralSnippets,
+    snippets: technologySnippets,
+  };
 }
 
 export async function getSnippetFile(snippetsDir: string, snippetFile: string) {

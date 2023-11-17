@@ -21,6 +21,37 @@ import {
 
 const PROJECT_DIR = "../examples/next";
 
+type GenerateOptions = {
+  projectDir: string;
+  regenerateDescription: boolean;
+};
+
+async function generate(originalUserPrompt: string, options?: GenerateOptions) {
+  consola.start("Creating:", originalUserPrompt, "\n");
+
+  if (!options || !options.projectDir) {
+    consola.error(
+      "next-ai requires a project directory to be specified under options: {projectDir: string}"
+    );
+    return;
+  }
+
+  if (!options.regenerateDescription) {
+    options.regenerateDescription = false;
+  }
+
+  const result = await completeTask(page, {
+    task,
+    snapshot: await getSnapshot(page),
+    options: options
+      ? {
+          model: options.model ?? "gpt-4-1106-preview",
+          debug: options.debug ?? false,
+        }
+      : undefined,
+  });
+}
+
 async function generate(
   originalUserPrompt: string,
   regenerateDescription: boolean
