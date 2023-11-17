@@ -1,11 +1,19 @@
-# nextjs-ai
+# Next.js AI
 
-Next.js boilerplate with AI capabilities to 10x your dev time.
+Build Next.js apps 10x faster with AI.
 
 ## Usage
 
-- Go to `aleph0` -> `cd aleph0`
-- Run `bun index.ts gen "<Your request>"`
+```sh
+cd aleph0
+pnpm i
+bun index.ts gen "add a form that creates a blog post"
+```
+
+## Notes
 
 To retract changes in the next directory:
-`git checkout origin/main -- ../examples/`
+
+```sh
+git checkout origin/main -- ../examples/
+```
