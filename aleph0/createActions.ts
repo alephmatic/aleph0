@@ -5,14 +5,9 @@ import { createFile, createFolder, readFile } from "./lib/file";
 import { Technology, TechnologySnippets } from "./types";
 import { RunnableFunctionWithParse } from "openai/lib/RunnableFunction";
 
-// export const createActions = (): Record<
-//   string,
-//   RunnableFunctionWithParse<any>
-// > => {
-export const createActions = (): Record<
-  string,
-  RunnableFunctionWithParse<any>
-> => {
+export const createActions = (options: {
+  technology: Technology;
+}): Record<string, RunnableFunctionWithParse<any>> => {
   return {
     // createTaskDescription: {
     //   function : async (args: { userPrompt: string }) => {
@@ -39,59 +34,34 @@ export const createActions = (): Record<
     //   },
     // },
     getSnippets: {
-      function: async (args: { technology: Technology }) => {
-        return { snippets: await loadSnippets(args.technology) };
+      function: async (args) => {
+        const technology = options.technology;
+        return { snippets: await loadSnippets(technology) };
       },
       name: "getSnippets",
       description:
         "Returns the snippets for a given technology ('next13_4'...) which helps creating files with context.",
       parse: (args: string) => {
-        return z
-          .object({
-            technology: z.string(),
-          })
-          .parse(JSON.parse(args));
+        return z.object({}).parse(JSON.parse(args));
       },
       parameters: {
         type: "object",
-        properties: {
-          technology: {
-            type: "string",
-          },
-        },
+        properties: {},
       },
     },
-    readSnippet: {
-      function: async (args: { snippetName: string }) => {
-        return { snippet: readFile(args.snippetName) }; // TODO: fix path
+    readFile: {
+      function: async (args: { filePath: string }) => {
+        return { fileContents: await readFile(args.filePath) };
       },
-      name: "readSnippet",
-      description: "Returns the content of a snippet.",
+      name: "readFile",
+      description: "Returns the contents of a file.",
       parse: (args: string) => {
-        return z.object({ snippetName: z.string() }).parse(JSON.parse(args));
+        return z.object({ filePath: z.string() }).parse(JSON.parse(args));
       },
       parameters: {
         type: "object",
         properties: {
-          snippetName: {
-            type: "string",
-          },
-        },
-      },
-    },
-    readGeneralSnippet: {
-      function: async (args: { snippetName: string }) => {
-        return { snippet: readFile(args.snippetName) }; // TODO: fix path
-      },
-      name: "readSnippet",
-      description: "Returns the general technology content of a snippet.",
-      parse: (args: string) => {
-        return z.object({ snippetName: z.string() }).parse(JSON.parse(args));
-      },
-      parameters: {
-        type: "object",
-        properties: {
-          snippetName: {
+          filePath: {
             type: "string",
           },
         },
@@ -151,8 +121,7 @@ export const createActions = (): Record<
     // updateFile: {
     //   // TODO: Update an existing file using text
     // },
-    // generateUsingSnippet: {
-    //   // TODO: Generate a file using a snippet (& general snippets?)
-    // },
+    // TODO: Other functions we might need:
+    // readExistingProjectFile, getExistingProjectStrcuture, checkPotentialBugsInFiles, searchForBugSolutionOnline
   };
 };

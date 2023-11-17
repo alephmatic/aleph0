@@ -8,23 +8,11 @@ function capitalize(string: string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-/*
-Finds all of the metadata.json files in the snippets directory returns json array
-*/
 export async function loadSnippets(
   technology: Technology
 ): Promise<TechnologySnippets> {
   const snippetsDir = path.join("./snippets", technology);
   const snippetDirs = await fs.readdir(snippetsDir, { withFileTypes: true });
-
-  // Files directly under the technology are general snippets.
-  const technologyGeneralSnippets: Snippet[] = snippetDirs
-    .filter((fd) => fd.isFile())
-    .map((fd) => ({
-      name: capitalize(fd.name),
-      file: fd.name,
-      explanation: `Details about ${fd.name} files when using ${technology}.`,
-    }));
 
   // Snippets are directories with a metadata.json file.
   const snippetsData = await Promise.all(
@@ -35,10 +23,20 @@ export async function loadSnippets(
   );
   const technologySnippets: Snippet[] = snippetsData
     .map((metadata) => metadata.replace(/[\n]/g, "").replace(/\s\s/g, ""))
-    .map((metadata) => JSON.parse(metadata));
+    .map((metadata) => JSON.parse(metadata))
+    .map((metadata) => ({
+      ...metadata,
+      path: path.join("./snippets", technology, metadata.path) + "/",
+      files: metadata.files.map((file: SnippetFile) => ({
+        ...file,
+        file: path.join("./snippets", technology, metadata.path, file.file),
+        references: file.references.map((reference: string) =>
+          path.join("./snippets", technology, reference)
+        ),
+      })),
+    }));
 
   return {
-    generalSnippets: technologyGeneralSnippets,
     snippets: technologySnippets,
   };
 }

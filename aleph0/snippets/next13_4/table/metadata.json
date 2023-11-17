@@ -4,7 +4,7 @@
   "path": "table",
   "files": [
     {
-      "name": "TABLE",
+      "name": "Table component",
       "file": "table.tsx",
       "explanation": "The table should be placed on the frontend in a `tables/<TABLE>.ts` file.",
       "references": ["page.tsx"]

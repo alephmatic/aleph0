@@ -19,11 +19,13 @@ export const functionCallPrompt = (options: {
 
   return `This is your task: ${userPrompt}
   
-  * When writing/reading files, use the absolute paths.
+  * Assume that the basic technology strucure of the project is already created.
+  * When writing/reading files, use the relative paths.
   * Only write/read files from this project directory: ${projectDir}
   * Current working directory: ${process.cwd()}
-  `;
-  //  * You must not derive data from thin air if you are able to do so by using one of the provided functions, e.g. readSnippet.`;
+  * You must not derive data from thin air if you are able to do so by using one of the provided functions, e.g. readSnippet.
+  * If a snippet contains a reference, read that reference file and use it together with the snippet file.
+  * Make sure you use all files in a snippet and create all corresponding files in the project. `;
 };
 
 // export const findRelevantSnippetPrompt = (options: {

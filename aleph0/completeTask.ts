@@ -8,6 +8,7 @@ const openai = new OpenAI();
 export const completeTask = async (
   userOriginalPrompt: string,
   options: {
+    technology: string;
     projectDir: string;
     model?: string;
   }
@@ -15,7 +16,7 @@ export const completeTask = async (
   let lastFunctionResult: null | { errorMessage: string } | { query: string } =
     null;
 
-  const actions = createActions();
+  const actions = createActions({ technology: options.technology });
   const promptString = functionCallPrompt({
     userPrompt: userOriginalPrompt,
     projectDir: options?.projectDir,
@@ -26,6 +27,8 @@ export const completeTask = async (
       model: options?.model ?? "gpt-4-1106-preview",
       messages: [{ role: "user", content: promptString }],
       functions: Object.values(actions),
+      temperature: 0,
+      frequency_penalty: 0,
     })
     .on("message", (message) => {
       consola.debug("> message", message);

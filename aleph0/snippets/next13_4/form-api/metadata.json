@@ -4,19 +4,19 @@
   "path": "form-api",
   "files": [
     {
-      "name": "FORM",
+      "name": "Form component",
       "file": "form.tsx",
       "explanation": "The form should be placed on the frontend in a `forms/<FORM>.ts` file.",
       "references": ["page.tsx"]
     },
     {
-      "name": "ROUTE",
+      "name": "Route file",
       "file": "route.ts",
       "explanation": "The `route.ts` file should be placed at `app/api/<FEATURE>/route.ts`. This can be imported as import '@/app/api/<FEATURE>/route.ts'.",
       "references": ["route.ts"]
     },
     {
-      "name": "VALIDATION",
+      "name": "Validation util file",
       "file": "validation.ts",
       "explanation": "The `validation.ts` file should be placed at `app/api/<FEATURE>/validation.ts`. This can be imported as import '@/app/api/<FEATURE>/validation.ts'.",
       "references": []

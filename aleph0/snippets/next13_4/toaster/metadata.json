@@ -4,8 +4,8 @@
   "path": "toaster",
   "files": [
     {
-      "name": "TOASTER",
-      "file": "table.tsx",
+      "name": "Toaster Component",
+      "file": "toaster.tsx",
       "explanation": "The toaster should be placed on the frontend in a `toasters/<TOASTER>.ts` file.",
       "references": ["page.tsx"]
     }

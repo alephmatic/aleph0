@@ -29,6 +29,7 @@ async function generate(originalUserPrompt: string, options?: GenerateOptions) {
   );
 
   const result = await completeTask(userPrompt, {
+    technology: "next13_4",
     projectDir: options.projectDir,
     model: options.model ?? "gpt-4-1106-preview",
   });
