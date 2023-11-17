@@ -1,7 +1,7 @@
 // import { RunnableFunctionWithParse } from "openai/lib/RunnableFunction";
 import { z } from "zod";
 import { loadSnippets } from "./utils";
-import { readFile } from "fs";
+import { createFile, readFile } from "./lib/file";
 import { Technology, TechnologySnippets } from "./types";
 
 // export const createActions = (): Record<
@@ -61,7 +61,7 @@ export const createActions = () => {
         snippetName: string;
         snippets: TechnologySnippets;
       }) => {
-        return { snippet: await readFile(args.snippets) }; // TODO: fix
+        return { snippet: readFile(args.snippetName) }; // TODO: fix
       },
       name: "readSnippet",
       description: "Returns the textual context of a snippet.",
@@ -73,7 +73,7 @@ export const createActions = () => {
         snippetName: string;
         snippets: TechnologySnippets;
       }) => {
-        return { snippet: await readFile(args.snippets.generalSnippets) }; // TODO: fix
+        return { snippet: readFile(args.snippetName) }; // TODO: fix
       },
       name: "readSnippet",
       description: "Returns the textual context of a snippet.",
@@ -81,7 +81,26 @@ export const createActions = () => {
       parameters: {},
     },
     createFile: {
-      // Write a new file using text
+      function: async (args: { filename: string }) => {
+        return { snippet: createFile(args.filename, "") };
+      },
+      name: "createFile",
+      description: "Create a new file.",
+      parse: (args: string) => {
+        return z
+          .object({
+            filename: z.string(),
+          })
+          .parse(JSON.parse(args));
+      },
+      parameters: {
+        type: "object",
+        properties: {
+          filename: {
+            type: "string",
+          },
+        },
+      },
     },
     updateFile: {
       // TODO: Update an existing file using text
