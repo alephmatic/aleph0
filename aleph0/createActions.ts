@@ -1,13 +1,14 @@
-import { RunnableFunctionWithParse } from "openai/lib/RunnableFunction";
+// import { RunnableFunctionWithParse } from "openai/lib/RunnableFunction";
 import { z } from "zod";
 import { loadSnippets } from "./utils";
 import { readFile } from "fs";
-import { TechnologySnippets } from "./types";
+import { Technology, TechnologySnippets } from "./types";
 
-export const createActions = (): Record<
-  string,
-  RunnableFunctionWithParse<any>
-> => {
+// export const createActions = (): Record<
+//   string,
+//   RunnableFunctionWithParse<any>
+// > => {
+export const createActions = () => {
   return {
     // createTaskDescription: {
     //   function : async (args: { userPrompt: string }) => {
@@ -34,7 +35,7 @@ export const createActions = (): Record<
     //   },
     // },
     getSnippets: {
-      function: async(args: {technology: string}) => {
+      function: async (args: { technology: Technology }) => {
         return { snippets: await loadSnippets(args.technology) };
       },
       name: "getSnippets",
@@ -54,33 +55,39 @@ export const createActions = (): Record<
           },
         },
       },
-    }
+    },
     readSnippet: {
-      function: async(args: {snippetName: string, snippets: TechnologySnippets}) => {
+      function: async (args: {
+        snippetName: string;
+        snippets: TechnologySnippets;
+      }) => {
         return { snippet: await readFile(args.snippets) }; // TODO: fix
       },
       name: "readSnippet",
       description: "Returns the textual context of a snippet.",
       parse: (args: string) => true,
-      parameters: { },
+      parameters: {},
     },
     readGeneralSnippet: {
-      function: async(args: {snippetName: string, snippets: TechnologySnippets}) => {
+      function: async (args: {
+        snippetName: string;
+        snippets: TechnologySnippets;
+      }) => {
         return { snippet: await readFile(args.snippets.generalSnippets) }; // TODO: fix
       },
       name: "readSnippet",
       description: "Returns the textual context of a snippet.",
       parse: (args: string) => true,
-      parameters: { },
-    }
-    writeNewFile: {
+      parameters: {},
+    },
+    createFile: {
       // Write a new file using text
     },
-    updateExistingFile: {
+    updateFile: {
       // TODO: Update an existing file using text
     },
     generateUsingSnippet: {
       // TODO: Generate a file using a snippet (& general snippets?)
-    }
+    },
   };
 };
