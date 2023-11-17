@@ -25,6 +25,10 @@ export async function loadSnippets(
       file: fd.name,
       explanation: `Details about ${fd.name} files when using ${technology}.`,
     }));
+  const generalSnippets: { (keys: string): Snippet } = {};
+  for (const tgs of technologyGeneralSnippets) {
+    generalSnippets[tgs.name] = tgs;
+  }
 
   // Snippets are directories with a metadata.json file.
   const snippetsData = await Promise.all(
