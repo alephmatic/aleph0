@@ -17,6 +17,9 @@ dependencies:
   ora:
     specifier: ^7.0.1
     version: 7.0.1
+  typescript:
+    specifier: ^5.0.0
+    version: 5.2.2
   zod:
     specifier: ^3.22.3
     version: 3.22.3
@@ -359,6 +362,12 @@ packages:
 
   /tr46@0.0.3:
     resolution: {integrity: sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==}
+    dev: false
+
+  /typescript@5.2.2:
+    resolution: {integrity: sha512-mI4WrpHsbCIcwT9cF4FZvr80QUeKvsUsUvKDoR+X/7XHQH98xYD8YHZg7ANtz2GtZt/CBq2QJ0thkGJMHfqc1w==}
+    engines: {node: '>=14.17'}
+    hasBin: true
     dev: false
 
   /util-deprecate@1.0.2:
