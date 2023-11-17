@@ -1,5 +1,3 @@
-import { SnippetMetadata } from "./types";
-
 export const createTaskDescriptionPrompt = (options: {
   userPrompt: string;
 }) => {
@@ -13,119 +11,134 @@ ${userPrompt}
 Task description:`;
 };
 
-export const findRelevantSnippetPrompt = (options: {
+export const functionCallPrompt = (options: {
   userPrompt: string;
-  snippets: SnippetMetadata[];
+  projectDir: string;
 }) => {
-  const { userPrompt, snippets } = options;
+  const { userPrompt, projectDir } = options;
 
-  return `
-Given the following snippets, in the following format per snippet: '{name} - {description} (path: {path})'\n
-${JSON.stringify(snippets)}
-
-Output should be a valid json from snippets above.
-return the most relevant snippet above to achieve: "${userPrompt}":\n`;
+  return `This is your task: ${userPrompt}
+  
+  * When writing/reading files, use the absolute paths.
+  * Only write/read files from this project directory: ${projectDir}
+  * Current working directory: ${process.cwd()}
+  `;
+  //  * You must not derive data from thin air if you are able to do so by using one of the provided functions, e.g. readSnippet.`;
 };
 
-export const chooseFilePathsPrompt = async (options: {
-  userPrompt: string;
-  snippetMetadata: SnippetMetadata;
-  projectStructure: string;
-}) => {
-  const { userPrompt, snippetMetadata, projectStructure } = options;
+// export const findRelevantSnippetPrompt = (options: {
+//   userPrompt: string;
+//   snippets: SnippetMetadata[];
+// }) => {
+//   const { userPrompt, snippets } = options;
 
-  return `You are an expert Next.js full-stack developer.
+//   return `
+// Given the following snippets, in the following format per snippet: '{name} - {description} (path: {path})'\n
+// ${JSON.stringify(snippets)}
 
-Your feedback is needed to create a new feature in the app:
-"${userPrompt}"
+// Output should be a valid json from snippets above.
+// return the most relevant snippet above to achieve: "${userPrompt}":\n`;
+// };
 
-You are given a collection of snippets to add to a project.
+// export const chooseFilePathsPrompt = async (options: {
+//   userPrompt: string;
+//   snippetMetadata: SnippetMetadata;
+//   projectStructure: string;
+// }) => {
+//   const { userPrompt, snippetMetadata, projectStructure } = options;
 
-A general description of the snippets:
-${snippetMetadata.description}
+//   return `You are an expert Next.js full-stack developer.
 
-The snippets:
-${JSON.stringify(snippetMetadata, null, 2)}
+// Your feedback is needed to create a new feature in the app:
+// "${userPrompt}"
 
-Placeholders are surrounded with < and >. Replace placeholders with the correct values.",
+// You are given a collection of snippets to add to a project.
 
-It is your job to choose the relative paths for where these snippets should be added to the project.
+// A general description of the snippets:
+// ${snippetMetadata.description}
 
-Return a JSON array in the following format:
-[
-  { "snippetName": "SNIPPET_NAME_1", "filePath": "PATH_1" },
-  { "snippetName": "SNIPPET_NAME_2", "filePath": "PATH_2" }
-]
+// The snippets:
+// ${JSON.stringify(snippetMetadata, null, 2)}
 
-"filePath" is relative to the project root directory and where the snippet should be added.
+// Placeholders are surrounded with < and >. Replace placeholders with the correct values.",
 
-DO NOT PLACE FILES IN COMPONENTS/UI FOLDER. CREATE NEW FILES.
-DO NOT EXPLAIN YOUR DECISIONS, ONLY RETURN A VALID JSON ARRAY.
+// It is your job to choose the relative paths for where these snippets should be added to the project.
 
-This is the current file tree of the project:
-${projectStructure}
-`;
-};
+// Return a JSON array in the following format:
+// [
+//   { "snippetName": "SNIPPET_NAME_1", "filePath": "PATH_1" },
+//   { "snippetName": "SNIPPET_NAME_2", "filePath": "PATH_2" }
+// ]
 
-const CODE_GEN_RULES = `
-RULES:
-- MAKE SURE TO FILL ANY UNFINISHED CODE (TODO), MAKE THE CODE COMPLETE.
-- ONLY RETURN ONE FILE CONTENTS, NOT MULTIPLE.
-- OUTPUT MUST NOT BE A CONVERSATION OR DESCRIPTION, SOURCE CODE ONLY.
-`;
+// "filePath" is relative to the project root directory and where the snippet should be added.
 
-export const createFilePrompt = async (options: {
-  snippet: string;
-  userPrompt: string;
-  snippetKnowledge: string;
-}) => {
-  const { snippet, userPrompt, snippetKnowledge } = options;
+// DO NOT PLACE FILES IN COMPONENTS/UI FOLDER. CREATE NEW FILES.
+// DO NOT EXPLAIN YOUR DECISIONS, ONLY RETURN A VALID JSON ARRAY.
 
-  return `You are an expert Next.js full-stack developer.
-You are following the user instructions to write code: ${userPrompt}
+// This is the current file tree of the project:
+// ${projectStructure}
+// `;
+// };
 
-This is a snippet you need to change to generate the final code:
-###
-${snippet}
-###
+// const CODE_GEN_RULES = `
+// RULES:
+// - MAKE SURE TO FILL ANY UNFINISHED CODE (TODO), MAKE THE CODE COMPLETE.
+// - ONLY RETURN ONE FILE CONTENTS, NOT MULTIPLE.
+// - OUTPUT MUST NOT BE A CONVERSATION OR DESCRIPTION, SOURCE CODE ONLY.
+// `;
 
-Additional knowledge that can help you:
-${snippetKnowledge}
+// export const createFilePrompt = async (options: {
+//   snippet: string;
+//   userPrompt: string;
+//   snippetKnowledge: string;
+// }) => {
+//   const { snippet, userPrompt, snippetKnowledge } = options;
 
-${CODE_GEN_RULES}
+//   return `You are an expert Next.js full-stack developer.
+// You are following the user instructions to write code: ${userPrompt}
 
-Final changed snippet code:
-###
-`;
-};
+// This is a snippet you need to change to generate the final code:
+// ###
+// ${snippet}
+// ###
 
-export const updateFilePrompt = async (options: {
-  snippet: string;
-  userPrompt: string;
-  snippetKnowledge: string;
-  fileContents: string;
-}) => {
-  const { snippet, userPrompt, snippetKnowledge, fileContents } = options;
+// Additional knowledge that can help you:
+// ${snippetKnowledge}
 
-  return `You are an expert Next.js full-stack developer.
-You are following the user instructions to write code: ${userPrompt}
+// ${CODE_GEN_RULES}
 
-This is a snippet you need to use to generate the final code:
-###
-${snippet}
-###
+// Final changed snippet code:
+// ###
+// `;
+// };
 
-Additional knowledge that can help you:
-${snippetKnowledge}
+// export const updateFilePrompt = async (options: {
+//   snippet: string;
+//   userPrompt: string;
+//   snippetKnowledge: string;
+//   fileContents: string;
+// }) => {
+//   const { snippet, userPrompt, snippetKnowledge, fileContents } = options;
 
-Update this code, using the information and snippet above:
-###
-${fileContents}
-###
+//   return `You are an expert Next.js full-stack developer.
+// You are following the user instructions to write code: ${userPrompt}
 
-${CODE_GEN_RULES}
+// This is a snippet you need to use to generate the final code:
+// ###
+// ${snippet}
+// ###
 
-Final updated code:
-###
-`;
-};
+// Additional knowledge that can help you:
+// ${snippetKnowledge}
+
+// Update this code, using the information and snippet above:
+// ###
+// ${fileContents}
+// ###
+
+// ${CODE_GEN_RULES}
+
+// Final updated code:
+// ###
+// `;
+// };

@@ -48,13 +48,19 @@ type SnippetFile = z.infer<typeof snippetFileSchema>;
 export const snippetSchema = z.object({
   name: z.string(),
   description: z.string(),
-  files: z.array(snippetFileSchema),
+  files: z.array(snippetFileSchema).optional(), // TODO: this is for general snippets to work - maybe create a new type for them?
   path: z.string(),
 });
-export type SnippetMetadata = z.infer<typeof snippetSchema>;
+export type Snippet = z.infer<typeof snippetSchema>;
 
 const technologySnippetsSchema = z.object({
   generalSnippets: z.array(snippetSchema),
   snippets: z.array(snippetSchema),
 });
 export type TechnologySnippets = z.infer<typeof technologySnippetsSchema>;
+
+export type FunctionCallingResult = {
+  assertion?: boolean;
+  query?: string;
+  errorMessage?: string;
+};

@@ -1,29 +1,15 @@
 import { Command } from "commander";
-import path from "path";
 import consola from "consola";
-import { getProjectStructure, loadSnippets, removeCodeWrapper } from "./utils";
-import {
-  createTaskDescriptionPrompt,
-  findRelevantSnippetPrompt,
-  chooseFilePathsPrompt,
-  createFilePrompt,
-  updateFilePrompt,
-} from "./prompts";
+import { createTaskDescriptionPrompt } from "./prompts";
 import { ai } from "./openai";
-import { createFile, readFile } from "./lib/file";
-import {
-  snippetMetadataSchema,
-  type SnippetMetadata,
-  changeFilesSchema,
-  type ChangeFilesSchemaWithSnippet,
-  isDefined,
-} from "./types";
+import { completeTask } from "./completeTask";
 
 const PROJECT_DIR = "../examples/next";
 
 type GenerateOptions = {
   projectDir: string;
   regenerateDescription: boolean;
+  model?: string;
 };
 
 async function generate(originalUserPrompt: string, options?: GenerateOptions) {
@@ -36,20 +22,33 @@ async function generate(originalUserPrompt: string, options?: GenerateOptions) {
     return;
   }
 
-  if (!options.regenerateDescription) {
-    options.regenerateDescription = false;
-  }
+  // TODO: maybe move to a function call?
+  const userPrompt = await generateDescription(
+    originalUserPrompt,
+    options.regenerateDescription
+  );
 
-  const result = await completeTask(page, {
-    task,
-    snapshot: await getSnapshot(page),
-    options: options
-      ? {
-          model: options.model ?? "gpt-4-1106-preview",
-          debug: options.debug ?? false,
-        }
-      : undefined,
+  const result = await completeTask(userPrompt, {
+    projectDir: options.projectDir,
+    model: options.model ?? "gpt-4-1106-preview",
   });
+
+  consola.info("Result:", result);
+}
+
+async function generateDescription(
+  originalUserPrompt: string,
+  regenerateDescription: boolean
+): Promise<string> {
+  if (!regenerateDescription) return originalUserPrompt;
+
+  consola.info(`Step 1a - create a cleaner task description`);
+  const regeneratedUserPrompt = await ai(
+    createTaskDescriptionPrompt({ userPrompt: originalUserPrompt })
+  );
+  if (!regeneratedUserPrompt) throw new Error(`AI didn't return a description`);
+
+  return regeneratedUserPrompt;
 }
 
 const program = new Command();
@@ -60,9 +59,18 @@ program
     "-srd, --skip-regenerate-description",
     "AI will skip regenerating the description"
   )
-  .action((text, options) => {
-    generate(text, { skipRegenerateDescription });
-  });
+  .option("-p --project-dir <projectDir>", "Project directory to work on.")
+  .action(
+    (
+      text,
+      options: { projectDir: string; skipRegenerateDescription: boolean }
+    ) => {
+      generate(text, {
+        projectDir: options.projectDir,
+        regenerateDescription: options.skipRegenerateDescription ?? false,
+      });
+    }
+  );
 program.parse(process.argv);
 
 // async function generate(
@@ -83,21 +91,6 @@ program.parse(process.argv);
 //   const newFiles = await generateNewFiles(userPrompt, snippetMetadata, changes);
 
 //   return newFiles;
-// }
-
-// async function generateDescription(
-//   originalUserPrompt: string,
-//   regenerateDescription: boolean
-// ): Promise<string> {
-//   if (!regenerateDescription) return originalUserPrompt;
-
-//   consola.info(`Step 1a - create a cleaner task description`);
-//   const regeneratedUserPrompt = await ai(
-//     createTaskDescriptionPrompt({ userPrompt: originalUserPrompt })
-//   );
-//   if (!regeneratedUserPrompt) throw new Error(`AI didn't return a description`);
-
-//   return regeneratedUserPrompt;
 // }
 
 // async function chooseSnippet(userPrompt: string): Promise<SnippetMetadata> {

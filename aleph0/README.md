@@ -18,3 +18,9 @@ bun run index.ts
 CONSOLA_LEVEL=4 bun index.ts gen "add a form that creates a blog post"
 CONSOLA_LEVEL=4 bun index.ts gen "add a form that updates a blog post"
 ```
+
+## Debug
+
+```bash
+CONSOLA_LEVEL=4 bun run index.ts gen "add a file named agam.ts in the app/ folder" -p ../examples/next -srd
+```
