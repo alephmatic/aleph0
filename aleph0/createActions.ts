@@ -33,11 +33,11 @@ export const createActions = (): Record<
     //     },
     //   },
     // },
-    listSnippets: {
+    getSnippets: {
       function: async(args: {technology: string}) => {
         return { snippets: await loadSnippets(args.technology) };
       },
-      name: "listSnippets",
+      name: "getSnippets",
       description: "Returns the snippets for a given technology (next13...).",
       parse: (args: string) => {
         return z
@@ -57,40 +57,30 @@ export const createActions = (): Record<
     }
     readSnippet: {
       function: async(args: {snippetName: string, snippets: TechnologySnippets}) => {
-        return { snippet: await readFile(args.snippetName) };
+        return { snippet: await readFile(args.snippets) }; // TODO: fix
+      },
+      name: "readSnippet",
+      description: "Returns the textual context of a snippet.",
+      parse: (args: string) => true,
+      parameters: { },
+    },
+    readGeneralSnippet: {
+      function: async(args: {snippetName: string, snippets: TechnologySnippets}) => {
+        return { snippet: await readFile(args.snippets.generalSnippets) }; // TODO: fix
       },
       name: "readSnippet",
       description: "Returns the textual context of a snippet.",
       parse: (args: string) => true,
       parameters: { },
     }
-    readSnippet: {
-      function: async (args: { snippetName: string }) => {
-        return { snippetData: await readFile(args.elementId).innerHTML() };
-      },
-      name: "readSnippet",
-      description: "Returns the element.innerHTML.",
-      parse: (args: string) => {
-        return z
-          .object({
-            elementId: z.string(),
-          })
-          .parse(JSON.parse(args));
-      },
-      parameters: {
-        type: "object",
-        properties: {
-          elementId: {
-            type: "string",
-          },
-        },
-      },
-    },
     writeNewFile: {
-
+      // Write a new file using text
     },
     updateExistingFile: {
-
+      // TODO: Update an existing file using text
+    },
+    generateUsingSnippet: {
+      // TODO: Generate a file using a snippet (& general snippets?)
     }
   };
 };
