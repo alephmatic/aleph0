@@ -70,7 +70,7 @@ export const createActions = (options: {
     createFile: {
       function: async (args: { filename: string; content: string }) => {
         await createFile(args.filename, args.content);
-        return true;
+        return `file ${args.filename} created.`;
       },
       name: "createFile",
       description: "write a new file with specified content (never empty).",

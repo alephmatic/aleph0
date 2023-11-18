@@ -5,9 +5,10 @@ export const createTaskDescriptionPrompt = (options: {
 
   return `You are an expert full-stack developer.
 Create a more complete description of this task to pass on to an AI agent.
-The description should be kept to 1-2 lines if possible.
+The description should be kept to 1-2 lines if possible. Make sure to not diviate from the user's task:
 ${userPrompt}
   
+Assume that the project structure exists already and you are adding/modyfing files to it.
 Task description:`;
 };
 
@@ -19,6 +20,7 @@ export const functionCallPrompt = (options: {
 
   return `This is your task: ${userPrompt}
   
+  * Make sure you use the relevant snippets only for the task, use the snippets metadata to understand what each snippet does.
   * Assume that the basic technology strucure of the project is already created.
   * When writing/reading files, use the relative paths.
   * Only write/read files from this project directory: ${projectDir}

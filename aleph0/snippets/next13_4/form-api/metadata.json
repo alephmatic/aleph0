@@ -6,8 +6,8 @@
     {
       "name": "Form component",
       "file": "form.tsx",
-      "explanation": "The form should be placed on the frontend in a `forms/<FORM>.ts` file.",
-      "references": ["page.tsx"]
+      "explanation": "The form component should be placed in the components directory as `components/form/<FORM>.ts` file.",
+      "references": ["component.tsx"]
     },
     {
       "name": "Route file",
