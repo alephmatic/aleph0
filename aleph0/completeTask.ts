@@ -45,6 +45,7 @@ export const completeTask = async (
 
   consola.debug("> finalContent", finalContent);
 
+  // TODO: fix this
   // if (!lastFunctionResult) {
   //   throw new Error("Expected to have result");
   // }

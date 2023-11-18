@@ -4,10 +4,6 @@ import consola from "consola";
 import { TechnologySnippets, Technology, Snippet } from "./types";
 import { readFile } from "./lib/file";
 
-function capitalize(string: string) {
-  return string.charAt(0).toUpperCase() + string.slice(1);
-}
-
 export async function loadSnippets(
   technology: Technology
 ): Promise<TechnologySnippets> {
@@ -39,55 +35,6 @@ export async function loadSnippets(
   return {
     snippets: technologySnippets,
   };
-}
-
-export async function getSnippetFile(snippetsDir: string, snippetFile: string) {
-  const path = `./snippets/${snippetsDir}/${snippetFile}`;
-  const fileContents = readFile(path);
-  return fileContents;
-}
-
-export async function getSnippetFiles(snippetPath: string) {
-  const snippetsDir = `./snippets/${snippetPath}`;
-  const files = await fs.readdir(snippetsDir);
-  const snippetFiles = await Promise.all(
-    files
-      .filter((file) => !file.endsWith(".json"))
-      .map(async (file) => {
-        const filePath = path.join(snippetsDir, file);
-        return filePath;
-      })
-  );
-  return snippetFiles;
-}
-
-async function getKnowledge(projectType: string) {
-  const folderPath = `./knowledge/${projectType}`;
-  const files = await fs.readdir(folderPath);
-  const fileContents: { [key: string]: string } = {};
-
-  for (const file of files) {
-    const fileName = file;
-    const filePath = `${folderPath}/${file}`;
-    const content = readFile(filePath);
-    fileContents[fileName] = content;
-  }
-
-  return fileContents;
-}
-
-/*
-Find knowledge relevant to the files, that might help openai decide what and how to change files
-*/
-export async function getGeneralAndRoutesKnowledge(projectType: string) {
-  const knowledge = await getKnowledge("nextjs13_4");
-  const generalKnowledge = knowledge["general.txt"];
-  const routesKnowledge = Object.keys(knowledge)
-    .filter((k) => k != "general.txt")
-    .map((k) => knowledge[k])
-    .join("\n");
-
-  return { knowledge, generalKnowledge, routesKnowledge };
 }
 
 /*
@@ -127,8 +74,4 @@ export async function getProjectStructure(
     })
   );
   return structure.filter(Boolean).join("\n");
-}
-
-export function removeCodeWrapper(code: string) {
-  return code.replace(/^###$/gm, "");
 }

@@ -9,30 +9,6 @@ export const createActions = (options: {
   technology: Technology;
 }): Record<string, RunnableFunctionWithParse<any>> => {
   return {
-    // createTaskDescription: {
-    //   function : async (args: { userPrompt: string }) => {
-    //     return {
-    //       taskDescription: await createTaskDescriptionPrompt(args.userPrompt), //TODO: need to call open AI here
-    //     };
-    //   },
-    //   name: "createTaskDescription",
-    //   description: "Returns a more complete task description before applying actions.",
-    //   parse: (args: string) => {
-    //     return z
-    //       .object({
-    //         userPrompt: z.string(),
-    //       })
-    //       .parse(JSON.parse(args));
-    //   },
-    //   parameters: {
-    //     type: "object",
-    //     properties: {
-    //       userPrompt: {
-    //         type: "string",
-    //       },
-    //     },
-    //   },
-    // },
     getSnippets: {
       function: async (args) => {
         const technology = options.technology;
@@ -123,5 +99,31 @@ export const createActions = (options: {
     // },
     // TODO: Other functions we might need:
     // readExistingProjectFile, getExistingProjectStrcuture, checkPotentialBugsInFiles, searchForBugSolutionOnline
+    //
+    // We might want to add this:
+    // createTaskDescription: {
+    //   function : async (args: { userPrompt: string }) => {
+    //     return {
+    //       taskDescription: await createTaskDescriptionPrompt(args.userPrompt), //TODO: need to call open AI here
+    //     };
+    //   },
+    //   name: "createTaskDescription",
+    //   description: "Returns a more complete task description before applying actions.",
+    //   parse: (args: string) => {
+    //     return z
+    //       .object({
+    //         userPrompt: z.string(),
+    //       })
+    //       .parse(JSON.parse(args));
+    //   },
+    //   parameters: {
+    //     type: "object",
+    //     properties: {
+    //       userPrompt: {
+    //         type: "string",
+    //       },
+    //     },
+    //   },
+    // },
   };
 };
