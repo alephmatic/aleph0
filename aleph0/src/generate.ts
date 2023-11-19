@@ -2,9 +2,11 @@ import consola from "consola";
 import { createTaskDescriptionPrompt } from "./prompts";
 import { ai } from "./openai";
 import { completeTask } from "./completeTask";
+import { Technology } from "./types";
 
 type GenerateOptions = {
   projectDir: string;
+  technology: Technology;
   regenerateDescription: boolean;
   model?: string;
 };
@@ -23,6 +25,7 @@ export async function generate(
   const result = await completeTask(userPrompt, {
     projectDir: options.projectDir,
     model: options.model ?? "gpt-4-1106-preview",
+    technology: options.technology,
   });
 
   consola.info("Result:", result);

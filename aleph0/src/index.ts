@@ -14,5 +14,6 @@ new Command()
     "AI will regenerate the description",
     true
   )
+  .option("-t, --technology", "The technology to use. eg. Next.js", "next13_4")
   .action(generate)
   .parse(process.argv);

@@ -4,15 +4,13 @@ import { createFile, createFolder, readFile } from "./lib/file";
 import { Technology, technologies, zodTechnology } from "./types";
 import { RunnableFunctionWithParse } from "openai/lib/RunnableFunction.mjs";
 
-export const createActions = (): Record<
-  string,
-  RunnableFunctionWithParse<any>
-> => {
+export const createActions = (
+  technology: Technology
+): Record<string, RunnableFunctionWithParse<any>> => {
   return {
     getSnippets: {
-      // TODO: maybe we should allow passing an array of technologies?
-      function: async (args: { technology: Technology }) => {
-        return { snippets: await loadSnippets(args.technology) };
+      function: async (_args: {}) => {
+        return { snippets: await loadSnippets(technology) };
       },
       name: "getSnippets",
       description:
