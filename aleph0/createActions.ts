@@ -2,10 +2,11 @@ import { z } from "zod";
 import { loadSnippets } from "./utils";
 import { createFile, createFolder, readFile } from "./lib/file";
 import { Technology } from "./types";
+import { RunnableFunctionWithParse } from "openai/lib/RunnableFunction.mjs";
 
 export const createActions = (options: {
   technology: Technology;
-}): Record<string, any> => {
+}): Record<string, RunnableFunctionWithParse<any>> => {
   const { technology } = options;
 
   return {
