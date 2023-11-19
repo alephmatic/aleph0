@@ -1,28 +1,33 @@
 import { z } from "zod";
 import { loadSnippets } from "./lib/utils";
 import { createFile, createFolder, readFile } from "./lib/file";
-import { Technology } from "./types";
+import { Technology, technologies, zodTechnology } from "./types";
 import { RunnableFunctionWithParse } from "openai/lib/RunnableFunction.mjs";
 
-export const createActions = (options: {
-  technology: Technology;
-}): Record<string, RunnableFunctionWithParse<any>> => {
-  const { technology } = options;
-
+export const createActions = (): Record<
+  string,
+  RunnableFunctionWithParse<any>
+> => {
   return {
     getSnippets: {
-      function: async (_args: {}) => {
-        return { snippets: await loadSnippets(technology) };
+      // TODO: maybe we should all it to pass in an array of technologies?
+      function: async (args: { technology: Technology }) => {
+        return { snippets: await loadSnippets(args.technology) };
       },
       name: "getSnippets",
       description:
-        "Returns the snippets for a given technology ('next13_4'...) which helps creating files with context.",
+        "Returns the snippets for a given technology which helps create files with context.",
       parse: (args: string) => {
-        return z.object({}).parse(JSON.parse(args));
+        return z.object({ technology: zodTechnology }).parse(JSON.parse(args));
       },
       parameters: {
         type: "object",
-        properties: {},
+        properties: {
+          technology: {
+            type: "string",
+            enum: [...technologies],
+          },
+        },
       },
     },
     readFile: {

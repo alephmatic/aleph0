@@ -8,7 +8,9 @@ export function isDefined<T>(value: T | undefined | null): value is T {
   return value !== undefined && value !== null;
 }
 
-export type Technology = "next13_4" | "nuxt"; // Nuxt is just an example, remove later.
+export const technologies = ["next13_4", "prisma"] as const;
+export const zodTechnology = z.enum(technologies);
+export type Technology = z.infer<typeof zodTechnology>;
 
 const snippetFileSchema = z.object({
   name: z.string(),

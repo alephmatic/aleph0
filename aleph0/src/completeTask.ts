@@ -2,12 +2,10 @@ import OpenAI from "openai";
 import consola from "consola";
 import { createActions } from "./createActions";
 import { functionCallPrompt } from "./prompts";
-import { Technology } from "./types";
 
 export const completeTask = async (
   userOriginalPrompt: string,
   options: {
-    technology: Technology;
     projectDir: string;
     model?: string;
   }
@@ -17,7 +15,7 @@ export const completeTask = async (
   let lastFunctionResult: null | { errorMessage: string } | { query: string } =
     null;
 
-  const actions = createActions({ technology: options.technology });
+  const actions = createActions();
   const promptString = functionCallPrompt({
     userPrompt: userOriginalPrompt,
     projectDir: options?.projectDir,
