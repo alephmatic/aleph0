@@ -10,7 +10,7 @@ export const createActions = (): Record<
 > => {
   return {
     getSnippets: {
-      // TODO: maybe we should all it to pass in an array of technologies?
+      // TODO: maybe we should allow passing an array of technologies?
       function: async (args: { technology: Technology }) => {
         return { snippets: await loadSnippets(args.technology) };
       },
