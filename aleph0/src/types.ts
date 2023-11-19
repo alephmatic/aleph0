@@ -8,7 +8,7 @@ export function isDefined<T>(value: T | undefined | null): value is T {
   return value !== undefined && value !== null;
 }
 
-export const technologies = ["next13_4", "prisma"] as const;
+export const technologies = ["next14", "prisma"] as const;
 export const zodTechnology = z.enum(technologies);
 export type Technology = z.infer<typeof zodTechnology>;
 

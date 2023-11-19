@@ -16,6 +16,7 @@ bun run src/index.ts
 
 ```bash
 CONSOLA_LEVEL=4 bun src/index.ts gen "add a form that creates a blog post" -p ../../examples/next
+CONSOLA_LEVEL=4 bun src/index.ts gen "create a prisma schema file with a blog model" -p ../../examples/next
 ```
 
 ## Debug
