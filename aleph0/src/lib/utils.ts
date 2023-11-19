@@ -1,12 +1,10 @@
 import fs from "fs/promises";
 import path from "path";
 import consola from "consola";
-import { TechnologySnippets, Technology, Snippet } from "./types";
-import { readFile } from "./lib/file";
+import { Technology, Snippet, SnippetFile } from "../types";
+import { readFile } from "./file";
 
-export async function loadSnippets(
-  technology: Technology
-): Promise<TechnologySnippets> {
+export async function loadSnippets(technology: Technology) {
   const snippetsDir = path.join("./snippets", technology);
   const snippetDirs = await fs.readdir(snippetsDir, { withFileTypes: true });
 
@@ -26,7 +24,7 @@ export async function loadSnippets(
       files: metadata.files.map((file: SnippetFile) => ({
         ...file,
         file: path.join("./snippets", technology, metadata.path, file.file),
-        references: file.references.map((reference: string) =>
+        references: file.references?.map((reference: string) =>
           path.join("./snippets", technology, reference)
         ),
       })),

@@ -1,22 +1,21 @@
 import OpenAI from "openai";
-import { createActions } from "./createActions";
-import { FunctionCallingResult } from "./types";
-import { functionCallPrompt } from "./prompts";
 import consola from "consola";
+import { createActions } from "./createActions";
+import { functionCallPrompt } from "./prompts";
 
-const openai = new OpenAI();
 export const completeTask = async (
   userOriginalPrompt: string,
   options: {
-    technology: string;
     projectDir: string;
     model?: string;
   }
-): Promise<FunctionCallingResult> => {
+) => {
+  const openai = new OpenAI({ apiKey: process.env["OPENAI_API_KEY"] });
+
   let lastFunctionResult: null | { errorMessage: string } | { query: string } =
     null;
 
-  const actions = createActions({ technology: options.technology });
+  const actions = createActions();
   const promptString = functionCallPrompt({
     userPrompt: userOriginalPrompt,
     projectDir: options?.projectDir,
@@ -32,13 +31,6 @@ export const completeTask = async (
     })
     .on("message", (message) => {
       consola.debug("> message", message);
-
-      if (
-        message.role === "assistant" &&
-        message.function_call?.name.startsWith("result")
-      ) {
-        lastFunctionResult = JSON.parse(message.function_call.arguments);
-      }
     });
 
   const finalContent = await runner.finalContent();
