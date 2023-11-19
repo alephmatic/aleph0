@@ -4,23 +4,14 @@ import { createTaskDescriptionPrompt } from "./prompts";
 import { ai } from "./openai";
 import { completeTask } from "./completeTask";
 
-const PROJECT_DIR = "../examples/next";
-
 type GenerateOptions = {
   projectDir: string;
   regenerateDescription: boolean;
   model?: string;
 };
 
-async function generate(originalUserPrompt: string, options?: GenerateOptions) {
+async function generate(originalUserPrompt: string, options: GenerateOptions) {
   consola.start("Creating:", originalUserPrompt, "\n");
-
-  if (!options || !options.projectDir) {
-    consola.error(
-      "next-ai requires a project directory to be specified under options: {projectDir: string}"
-    );
-    return;
-  }
 
   // TODO: maybe move to a function call?
   const userPrompt = await generateDescription(
@@ -56,11 +47,15 @@ const program = new Command();
 program
   .command("gen <text>")
   .description("Generate nextjs snippet.")
+  .requiredOption(
+    "-p --project-dir <projectDir>",
+    "Project directory to work on.",
+    process.cwd()
+  )
   .option(
     "-srd, --skip-regenerate-description",
     "AI will skip regenerating the description"
   )
-  .option("-p --project-dir <projectDir>", "Project directory to work on.")
   .action(
     (
       text,

@@ -15,8 +15,7 @@ bun run index.ts
 ## Test cases
 
 ```bash
-CONSOLA_LEVEL=4 bun index.ts gen "add a form that creates a blog post"
-CONSOLA_LEVEL=4 bun index.ts gen "add a form that updates a blog post"
+CONSOLA_LEVEL=4 bun index.ts gen "add a form that creates a blog post" -p ../examples/next
 ```
 
 ## Debug
