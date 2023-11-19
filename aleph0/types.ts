@@ -8,7 +8,7 @@ export function isDefined<T>(value: T | undefined | null): value is T {
   return value !== undefined && value !== null;
 }
 
-export type Technology = "nextjs13" | "nuxt"; // Nuxt is just an example, remove later.
+export type Technology = "next13_4" | "nuxt"; // Nuxt is just an example, remove later.
 
 const snippetFileSchema = z.object({
   name: z.string(),

@@ -1,18 +1,19 @@
 import OpenAI from "openai";
-import { createActions } from "./createActions";
-import { FunctionCallingResult } from "./types";
-import { functionCallPrompt } from "./prompts";
 import consola from "consola";
+import { createActions } from "./createActions";
+import { functionCallPrompt } from "./prompts";
+import { Technology } from "./types";
 
-const openai = new OpenAI();
 export const completeTask = async (
   userOriginalPrompt: string,
   options: {
-    technology: string;
+    technology: Technology;
     projectDir: string;
     model?: string;
   }
-): Promise<FunctionCallingResult> => {
+) => {
+  const openai = new OpenAI({ apiKey: process.env["OPENAI_API_KEY"] });
+
   let lastFunctionResult: null | { errorMessage: string } | { query: string } =
     null;
 
