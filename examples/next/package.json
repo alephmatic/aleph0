@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "gen": "node ./aleph0/index.ts"
+    "gen": "node ./aleph0/src/index.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.1",

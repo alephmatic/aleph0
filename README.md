@@ -7,7 +7,7 @@ Build Next.js apps 10x faster with AI.
 ```sh
 cd aleph0
 pnpm i
-bun index.ts gen "add a form that creates a blog post"
+bun src/index.ts gen "add a form that creates a blog post"
 ```
 
 ## Notes

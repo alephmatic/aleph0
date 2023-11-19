@@ -23,7 +23,10 @@ import {
 import { useToast } from "@/components/ui/use-toast";
 import { postRequest } from "@/lib/api";
 // change this to the appropriate route
-import { userProfileBody, UserProfileBody } from "@/app/api/user/settings/validation";
+import {
+  userProfileBody,
+  UserProfileBody,
+} from "@/app/api/user/settings/validation";
 
 export function ProfileForm() {
   const { toast } = useToast();
@@ -58,6 +61,7 @@ export function ProfileForm() {
     }
   }
 
+  // Make sure to change the form fields to match your API
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">

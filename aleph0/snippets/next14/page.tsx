@@ -3,6 +3,8 @@ A page is UI that is unique to a route. You can define pages by exporting a comp
 Examples:
 app/page.tsx
 
+Component file content example snippet:
+```tsx
 // `app/page.tsx` is the UI for the `/` URL
 export default function Page() {
   return <h1>Hello, Home page!</h1>
@@ -14,12 +16,14 @@ app/dashboard/page.tsx
 export default function Page() {
   return <h1>Hello, Dashboard Page!</h1>
 }
+```
 
 Good to know:
-  A page is always the leaf of the route subtree.
-  .js, .jsx, or .tsx file extensions can be used for Pages.
-  A page.js file is required to make a route segment publicly accessible.
+A page is always the leaf of the route subtree.
+.jsx, or .tsx file extensions can be used for Pages.
+A page.tsx file is required to make a route segment publicly accessible.
 
 Rules:
-  - Make sure that every API route in your code correlates directly to where route.ts will be placed.
-  - Place page files only under app/ NOT under app/components/
+Make sure that every API route in your code correlates directly to where route.ts will be placed.
+Place page files only under app/ NOT under app/components/
+Make sure when you create a page file that the file name is "page.tsx/jsx" it's a next.js convention.
