@@ -43,8 +43,7 @@ async function generateDescription(
   return regeneratedUserPrompt;
 }
 
-const program = new Command();
-program
+new Command()
   .command("gen <text>")
   .description("Generate nextjs snippet.")
   .requiredOption(
@@ -53,18 +52,9 @@ program
     process.cwd()
   )
   .option(
-    "-srd, --skip-regenerate-description",
-    "AI will skip regenerating the description"
+    "-rd, --regenerate-description",
+    "AI will regenerate the description",
+    true
   )
-  .action(
-    (
-      text,
-      options: { projectDir: string; skipRegenerateDescription: boolean }
-    ) => {
-      generate(text, {
-        projectDir: options.projectDir,
-        regenerateDescription: options.skipRegenerateDescription ?? false,
-      });
-    }
-  );
-program.parse(process.argv);
+  .action(generate)
+  .parse(process.argv);
