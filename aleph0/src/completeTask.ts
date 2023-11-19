@@ -34,19 +34,19 @@ export const completeTask = async (
     .on("message", (message) => {
       consola.debug("> message", message);
 
-      if (
-        message.role === "assistant" &&
-        message.function_call?.name.startsWith("result")
-      ) {
-        lastFunctionResult = JSON.parse(message.function_call.arguments);
-      }
+      // if (
+      //   message.role === "assistant" &&
+      //   message.function_call?.name.startsWith("result")
+      // ) {
+      //   lastFunctionResult = JSON.parse(message.function_call.arguments);
+      // }
     });
 
   const finalContent = await runner.finalContent();
 
   consola.debug("> finalContent", finalContent);
 
-  // TODO: fix this
+  // TODO: not sure we actually need this
   // if (!lastFunctionResult) {
   //   throw new Error("Expected to have result");
   // }
