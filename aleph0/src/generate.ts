@@ -15,7 +15,6 @@ export async function generate(
 ) {
   consola.start("Creating:", originalUserPrompt, "\n");
 
-  // TODO: maybe move to a function call?
   const userPrompt = await generateDescription(
     originalUserPrompt,
     options.regenerateDescription
