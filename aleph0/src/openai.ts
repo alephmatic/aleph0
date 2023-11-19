@@ -1,6 +1,7 @@
 import consola from "consola";
 import OpenAI from "openai";
 import ora from "ora";
+import { ChatCompletionMessageParam } from "openai/resources/index.mjs";
 
 const openai = new OpenAI({
   apiKey: process.env["OPENAI_API_KEY"],
@@ -15,9 +16,7 @@ export async function ai(
 
   consola.debug("OpenAI content:", content);
 
-  let messages: OpenAI.Chat.ChatCompletionMessage[] = [
-    { role: "user", content },
-  ];
+  let messages: Array<ChatCompletionMessageParam> = [{ role: "user", content }];
   if (instructions)
     messages = [{ role: "system", content: instructions }, ...messages];
 
