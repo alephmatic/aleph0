@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { loadSnippets } from "./utils";
+import { loadSnippets } from "./lib/utils";
 import { createFile, createFolder, readFile } from "./lib/file";
 import { Technology } from "./types";
 import { RunnableFunctionWithParse } from "openai/lib/RunnableFunction.mjs";

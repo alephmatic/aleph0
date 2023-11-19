@@ -1,8 +1,8 @@
 import fs from "fs/promises";
 import path from "path";
 import consola from "consola";
-import { Technology, Snippet, SnippetFile } from "./types";
-import { readFile } from "./lib/file";
+import { Technology, Snippet, SnippetFile } from "../types";
+import { readFile } from "./file";
 
 export async function loadSnippets(technology: Technology) {
   const snippetsDir = path.join("./snippets", technology);
