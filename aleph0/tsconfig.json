@@ -7,7 +7,6 @@
     "moduleDetection": "force",
     "allowImportingTsExtensions": true,
     "noEmit": true,
-    "composite": true,
     "strict": true,
     "downlevelIteration": true,
     "skipLibCheck": true,
@@ -20,5 +19,6 @@
       "bun-types" // add Bun global
     ]
   },
+  "include": ["src"],
   "exclude": ["snippets"]
 }
