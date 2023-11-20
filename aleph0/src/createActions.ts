@@ -25,12 +25,12 @@ export const createActions = (
         properties: {},
       },
     },
-    readFile: {
+    readSnippetFile: {
       function: async (args: { filePath: string }) => {
         return { fileContents: readFile(args.filePath) };
       },
-      name: "readFile",
-      description: "Returns the contents of a file.",
+      name: "readSnippetFile",
+      description: "Returns the contents of a snippet file.",
       parse: (args: string) => {
         return z.object({ filePath: z.string() }).parse(JSON.parse(args));
       },
@@ -46,7 +46,7 @@ export const createActions = (
     createFile: {
       function: async (args: { filename: string; content: string }) => {
         createFile(`${projectRoot}/${args.filename}`, args.content);
-        return `file ${args.filename} created.`;
+        return { success: true };
       },
       name: "createFile",
       description:
@@ -74,7 +74,7 @@ export const createActions = (
     createDirectory: {
       function: async (args: { directoryPath: string }) => {
         createFolder(`${projectRoot}/${args.directoryPath}`);
-        return true;
+        return { success: true };
       },
       name: "createDirectory",
       description: "Create a new directory relative to the project root.",
