@@ -1,8 +1,10 @@
 import { Command } from "commander";
 import { generate } from "./generate";
 
-new Command()
-  .command("gen <text>")
+const program = new Command();
+
+program
+  .command("gen <prompt>")
   .description("Generate code.")
   .requiredOption(
     "-p --project-dir <projectDir>",
@@ -20,5 +22,6 @@ new Command()
     "The model to use. eg. gpt-4-1106-preview",
     "gpt-4-1106-preview"
   )
-  .action(generate)
-  .parse(process.argv);
+  .action(generate);
+
+program.parse(process.argv);
