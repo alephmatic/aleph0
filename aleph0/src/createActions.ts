@@ -2,7 +2,7 @@ import { z } from "zod";
 import kebabCase from "lodash/kebabCase";
 import { loadSnippets } from "./lib/utils";
 import { createFile, createFolder, readFile } from "./lib/file";
-import { Technology } from "./types";
+import { SnippetFile, Technology } from "./types";
 import { RunnableFunctionWithParse } from "openai/lib/RunnableFunction.mjs";
 
 export const createActions = async (
@@ -10,15 +10,7 @@ export const createActions = async (
   projectRoot: string
 ): Promise<Record<string, RunnableFunctionWithParse<any>>> => {
   const { snippets: snippetsWithoutIds } = await loadSnippets(technology);
-  const files: Record<
-    string,
-    {
-      name: string;
-      file: string;
-      explanation: string;
-      references?: string[];
-    }
-  > = {};
+  const files: Record<string, SnippetFile> = {};
 
   const snippets = snippetsWithoutIds.map((snippet) => {
     return {
