@@ -1,39 +1,36 @@
 import { z } from "zod";
 import { loadSnippets } from "./lib/utils";
 import { createFile, createFolder, readFile } from "./lib/file";
-import { Technology, technologies, zodTechnology } from "./types";
+import { Technology, zodTechnology } from "./types";
 import { RunnableFunctionWithParse } from "openai/lib/RunnableFunction.mjs";
 
 export const createActions = (
-  technology: Technology
+  technology: Technology,
+  projectRoot: string
 ): Record<string, RunnableFunctionWithParse<any>> => {
   return {
     getSnippets: {
       function: async (_args: {}) => {
-        return { snippets: await loadSnippets(technology) };
+        const snippets = await loadSnippets(technology);
+        return { snippets };
       },
       name: "getSnippets",
       description:
         "Returns the snippets for a given technology which helps create files with context.",
       parse: (args: string) => {
-        return z.object({ technology: zodTechnology }).parse(JSON.parse(args));
+        return z.object({}).parse(JSON.parse(args));
       },
       parameters: {
         type: "object",
-        properties: {
-          technology: {
-            type: "string",
-            enum: [...technologies],
-          },
-        },
+        properties: {},
       },
     },
-    readFile: {
+    readSnippetFile: {
       function: async (args: { filePath: string }) => {
         return { fileContents: readFile(args.filePath) };
       },
-      name: "readFile",
-      description: "Returns the contents of a file.",
+      name: "readSnippetFile",
+      description: "Returns the contents of a snippet file.",
       parse: (args: string) => {
         return z.object({ filePath: z.string() }).parse(JSON.parse(args));
       },
@@ -48,11 +45,12 @@ export const createActions = (
     },
     createFile: {
       function: async (args: { filename: string; content: string }) => {
-        createFile(args.filename, args.content);
-        return `file ${args.filename} created.`;
+        createFile(`${projectRoot}/${args.filename}`, args.content);
+        return { success: true };
       },
       name: "createFile",
-      description: "write a new file with specified content (never empty).",
+      description:
+        "Write a new file relative to the project root with specified content (never empty).",
       parse: (args: string) => {
         return z
           .object({
@@ -75,12 +73,11 @@ export const createActions = (
     },
     createDirectory: {
       function: async (args: { directoryPath: string }) => {
-        createFolder(args.directoryPath);
-        return true;
+        createFolder(`${projectRoot}/${args.directoryPath}`);
+        return { success: true };
       },
       name: "createDirectory",
-      description:
-        "Create a new directory from the relative current working directory.",
+      description: "Create a new directory relative to the project root.",
       parse: (args: string) => {
         return z
           .object({
