@@ -27,4 +27,5 @@ CONSOLA_LEVEL=4 bun run src/index.ts gen "add a file named agam.ts in the app/ f
 
 ## Building
 
-`bun run build`
+`npm run build`
+`npm i -g .`

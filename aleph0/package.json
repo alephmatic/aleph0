@@ -17,7 +17,7 @@
     "typescript": "^5.0.0"
   },
   "scripts": {
-    "build": "bun build ./src/index.ts --minify --target=node --outdir ./dist"
+    "build": "npx tsc ./src/index.ts --outDir ./dist --esModuleInterop --target esnext -d --moduleResolution bundler --moduleDetection force"
   },
   "bin": {
     "a0": "./dist/index.js"

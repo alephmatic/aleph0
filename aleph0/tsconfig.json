@@ -15,6 +15,7 @@
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "allowJs": true,
+    "outDir": "dist",
     "types": [
       "bun-types" // add Bun global
     ]
