@@ -5,23 +5,20 @@ import { functionCallPrompt } from "./prompts";
 import { Technology } from "./types";
 
 export const completeTask = async (
-  userOriginalPrompt: string,
+  userPrompt: string,
   options: {
     technology: Technology;
     projectDir: string;
     model?: string;
   }
 ) => {
-  const openai = new OpenAI({ apiKey: process.env["OPENAI_API_KEY"] });
+  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
   let lastFunctionResult: null | { errorMessage: string } | { query: string } =
     null;
 
-  const actions = createActions(options.technology);
-  const promptString = functionCallPrompt({
-    userPrompt: userOriginalPrompt,
-    projectDir: options?.projectDir,
-  });
+  const promptString = functionCallPrompt({ userPrompt });
+  const actions = createActions(options.technology, options.projectDir);
 
   const runner = openai.beta.chat.completions
     .runFunctions({
