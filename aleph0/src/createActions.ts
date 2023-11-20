@@ -11,13 +11,14 @@ export const createActions = (
   return {
     getSnippets: {
       function: async (_args: {}) => {
-        return { snippets: await loadSnippets(technology) };
+        const snippets = await loadSnippets(technology);
+        return { snippets };
       },
       name: "getSnippets",
       description:
         "Returns the snippets for a given technology which helps create files with context.",
       parse: (args: string) => {
-        return z.object({ technology: zodTechnology }).parse(JSON.parse(args));
+        return z.object({}).parse(JSON.parse(args));
       },
       parameters: {
         type: "object",
