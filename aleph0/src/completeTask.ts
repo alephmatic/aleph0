@@ -17,8 +17,8 @@ export const completeTask = async (
   let lastFunctionResult: null | { errorMessage: string } | { query: string } =
     null;
 
-  const actions = createActions(options.technology, options.projectDir);
   const promptString = functionCallPrompt({ userPrompt });
+  const actions = createActions(options.technology, options.projectDir);
 
   const runner = openai.beta.chat.completions
     .runFunctions({
