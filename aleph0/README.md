@@ -35,7 +35,7 @@ Snippets are key components in aleph0, providing valuable context to the AI. The
 
 - **Location**: Snippets are located in the `snippets` folder.
 - **Types of Snippets**:
-  - **General Technology Snippets**: These explain aspects of a framework. For instance, `page.tsx` in Next.js.
+  - **General Technology Snippets**: These explain general aspects of a framework. For instance how `page.tsx` is a special file in Next.js.
   - **Metadata.ts**: This file contains details about the snippet, like its purpose, file paths, and references to framework-related files. It helps the AI understand the snippet's context.
   - **Code Examples**: Other files in the snippets directory typically contain raw code examples showing how to implement the snippet.
 
@@ -51,4 +51,22 @@ snippets/
     toaster/
       metadata.ts - Metadata for the toaster snippet.
       toaster.tsx - Example of a toaster in Next.js version 14.
+```
+
+## Example metadata.ts
+
+```ts
+{
+  "name": "Toaster",
+  "description": "A toast component example - A short message that is displayed temporarily.",
+  "path": "toaster", // directory path for the snippet
+  "files": [
+    {
+      "name": "Toaster Component",
+      "file": "toaster.tsx", // the actual raw code example on how to use the snippet
+      "explanation": "The toaster should be placed on the frontend in a `toasters/<TOASTER>.ts` file.",
+      "references": ["page.tsx"] // extra information related to the snippet like next.js's `page.tsx` conventions.
+    }
+  ]
+}
 ```
