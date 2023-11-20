@@ -11,13 +11,14 @@
   },
   "devDependencies": {
     "@types/node": "^20.9.1",
-    "bun-types": "latest"
+    "bun-types": "latest",
+    "tsup": "^8.0.0"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
   },
   "scripts": {
-    "build": "npx tsc ./src/index.ts --outDir ./dist --esModuleInterop --target esnext -d --moduleResolution bundler --moduleDetection force"
+    "build": "tsup"
   },
   "bin": {
     "a0": "./dist/index.js"
