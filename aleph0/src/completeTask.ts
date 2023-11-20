@@ -12,12 +12,12 @@ export const completeTask = async (
     model?: string;
   }
 ) => {
-  const openai = new OpenAI({ apiKey: process.env["OPENAI_API_KEY"] });
+  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
   let lastFunctionResult: null | { errorMessage: string } | { query: string } =
     null;
 
-  const actions = createActions(options.technology);
+  const actions = createActions(options.technology, options.projectDir);
   const promptString = functionCallPrompt({ userPrompt });
 
   const runner = openai.beta.chat.completions

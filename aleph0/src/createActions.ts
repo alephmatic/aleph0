@@ -1,11 +1,12 @@
 import { z } from "zod";
 import { loadSnippets } from "./lib/utils";
 import { createFile, createFolder, readFile } from "./lib/file";
-import { Technology, technologies, zodTechnology } from "./types";
+import { Technology, zodTechnology } from "./types";
 import { RunnableFunctionWithParse } from "openai/lib/RunnableFunction.mjs";
 
 export const createActions = (
-  technology: Technology
+  technology: Technology,
+  projectRoot: string
 ): Record<string, RunnableFunctionWithParse<any>> => {
   return {
     getSnippets: {
@@ -20,12 +21,7 @@ export const createActions = (
       },
       parameters: {
         type: "object",
-        properties: {
-          technology: {
-            type: "string",
-            enum: [...technologies],
-          },
-        },
+        properties: {},
       },
     },
     readFile: {
@@ -48,11 +44,12 @@ export const createActions = (
     },
     createFile: {
       function: async (args: { filename: string; content: string }) => {
-        createFile(args.filename, args.content);
+        createFile(`${projectRoot}/${args.filename}`, args.content);
         return `file ${args.filename} created.`;
       },
       name: "createFile",
-      description: "write a new file with specified content (never empty).",
+      description:
+        "Write a new file relative to the project root with specified content (never empty).",
       parse: (args: string) => {
         return z
           .object({
@@ -75,12 +72,11 @@ export const createActions = (
     },
     createDirectory: {
       function: async (args: { directoryPath: string }) => {
-        createFolder(args.directoryPath);
+        createFolder(`${projectRoot}/${args.directoryPath}`);
         return true;
       },
       name: "createDirectory",
-      description:
-        "Create a new directory from the relative current working directory.",
+      description: "Create a new directory relative to the project root.",
       parse: (args: string) => {
         return z
           .object({
