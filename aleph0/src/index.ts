@@ -15,5 +15,10 @@ new Command()
     true
   )
   .option("-t, --technology", "The technology to use. eg. Next.js", "next14")
+  .option(
+    "-m, --model",
+    "The model to use. eg. gpt-4-1106-preview",
+    "gpt-4-1106-preview"
+  )
   .action(generate)
   .parse(process.argv);

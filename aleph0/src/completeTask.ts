@@ -5,7 +5,7 @@ import { functionCallPrompt } from "./prompts";
 import { Technology } from "./types";
 
 export const completeTask = async (
-  userOriginalPrompt: string,
+  userPrompt: string,
   options: {
     technology: Technology;
     projectDir: string;
@@ -18,10 +18,7 @@ export const completeTask = async (
     null;
 
   const actions = createActions(options.technology);
-  const promptString = functionCallPrompt({
-    userPrompt: userOriginalPrompt,
-    projectDir: options?.projectDir,
-  });
+  const promptString = functionCallPrompt({ userPrompt });
 
   const runner = openai.beta.chat.completions
     .runFunctions({

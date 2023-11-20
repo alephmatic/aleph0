@@ -22,11 +22,7 @@ export async function generate(
     options.regenerateDescription
   );
 
-  const result = await completeTask(userPrompt, {
-    projectDir: options.projectDir,
-    model: options.model ?? "gpt-4-1106-preview",
-    technology: options.technology,
-  });
+  const result = await completeTask(userPrompt, options);
 
   consola.info("Result:", result);
 }
