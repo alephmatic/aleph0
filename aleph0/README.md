@@ -56,17 +56,23 @@ snippets/
 ## Example metadata.ts
 
 ```ts
-{
-  "name": "Toaster",
-  "description": "A toast component example - A short message that is displayed temporarily.",
-  "path": "toaster", // directory path for the snippet
-  "files": [
+export const metadata: Metadata = {
+  name: "Toaster",
+  description:
+    "A toast component example - A short message that is displayed temporarily.",
+  // comment
+  path: "toaster", // directory path for the snippet
+  long: `multiline
+  
+multiline`,
+  files: [
     {
-      "name": "Toaster Component",
-      "file": "toaster.tsx", // the actual raw code example on how to use the snippet
-      "explanation": "The toaster should be placed on the frontend in a `toasters/<TOASTER>.ts` file.",
-      "references": ["page.tsx"] // extra information related to the snippet like next.js's `page.tsx` conventions.
-    }
-  ]
-}
+      name: "Toaster Component",
+      file: "toaster.tsx",
+      explanation:
+        "The toaster should be placed on the frontend in a `toasters/<TOASTER>.ts` file.",
+      references: ["page.tsx"], // extra information related to the snippet like next.js's `page.tsx` conventions.
+    },
+  ],
+};
 ```
