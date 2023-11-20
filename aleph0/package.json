@@ -1,5 +1,5 @@
 {
-  "name": "aleph0",
+  "name": "@alephmatic/aleph0",
   "module": "src/index.ts",
   "type": "module",
   "dependencies": {
@@ -15,5 +15,18 @@
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
-  }
+  },
+  "scripts": {
+    "build": "bun build ./src/index.ts --minify --target=node --outdir ./dist"
+  },
+  "bin": {
+    "a0": "./dist/index.js"
+  },
+  "license": "MIT",
+  "keywords": [
+    "cli",
+    "aleph",
+    "nextjs",
+    "ai"
+  ]
 }

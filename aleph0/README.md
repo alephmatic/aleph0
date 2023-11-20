@@ -24,3 +24,7 @@ CONSOLA_LEVEL=4 bun src/index.ts gen "create a prisma schema file with a blog mo
 ```bash
 CONSOLA_LEVEL=4 bun run src/index.ts gen "add a file named agam.ts in the app/ folder" -p ../../examples/next -rd false
 ```
+
+## Building
+
+`bun run build`

@@ -1,7 +1,7 @@
 import { Command } from "commander";
 import { generate } from "./generate";
 
-new Command()
+new Command("a0")
   .command("gen <text>")
   .description("Generate code.")
   .requiredOption(
