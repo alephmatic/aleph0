@@ -1,18 +1,43 @@
 import { z } from "zod";
+import kebabCase from "lodash/kebabCase";
 import { loadSnippets } from "./lib/utils";
 import { createFile, createFolder, readFile } from "./lib/file";
-import { Technology, zodTechnology } from "./types";
+import { Technology } from "./types";
 import { RunnableFunctionWithParse } from "openai/lib/RunnableFunction.mjs";
 
-export const createActions = (
+export const createActions = async (
   technology: Technology,
   projectRoot: string
-): Record<string, RunnableFunctionWithParse<any>> => {
+): Promise<Record<string, RunnableFunctionWithParse<any>>> => {
+  const { snippets: snippetsWithoutIds } = await loadSnippets(technology);
+  const files: Record<
+    string,
+    {
+      name: string;
+      file: string;
+      explanation: string;
+      references?: string[];
+    }
+  > = {};
+
+  const snippets = snippetsWithoutIds.map((snippet) => {
+    return {
+      ...snippet,
+      files: snippet.files?.map((file) => {
+        const id = `${kebabCase(snippet.name)}/${kebabCase(file.file)}`;
+        files[id] = file;
+        return {
+          ...file,
+          id,
+        };
+      }),
+    };
+  });
+
   return {
     getSnippets: {
       function: async (_args: {}) => {
-        const snippets = await loadSnippets(technology);
-        return { snippets };
+        return snippets;
       },
       name: "getSnippets",
       description:
@@ -25,20 +50,47 @@ export const createActions = (
         properties: {},
       },
     },
-    readSnippetFile: {
-      function: async (args: { filePath: string }) => {
-        return { fileContents: readFile(args.filePath) };
+    expandSnippet: {
+      function: async (args: { id: string }) => {
+        console.log("🚀 id:", args.id);
+
+        const { file, references } = files[args.id];
+
+        const directory = process.cwd();
+
+        const filePath = `${directory}/${file}`;
+        const fileContents = readFile(filePath);
+        const referenceContents = references?.map((reference) => {
+          return {
+            name: reference,
+            contents: readFile(`${directory}/${reference}`),
+          };
+        });
+
+        const contents = `## File:
+${fileContents}
+
+## References:
+
+${referenceContents?.map(
+  (reference) => `### ${reference.name}
+${reference.contents}`
+)}
+`;
+
+        return contents;
       },
-      name: "readSnippetFile",
-      description: "Returns the contents of a snippet file.",
+      name: "expandSnippet",
+      description: "Returns the contents and references of a snippet file.",
       parse: (args: string) => {
-        return z.object({ filePath: z.string() }).parse(JSON.parse(args));
+        return z.object({ id: z.string() }).parse(JSON.parse(args));
       },
       parameters: {
         type: "object",
         properties: {
-          filePath: {
+          id: {
             type: "string",
+            description: "The id of the snippet file.",
           },
         },
       },
@@ -50,7 +102,7 @@ export const createActions = (
       },
       name: "createFile",
       description:
-        "Write a new file relative to the project root with specified content (never empty).",
+        "Write a new file relative to the project root with specified content.",
       parse: (args: string) => {
         return z
           .object({
@@ -64,9 +116,11 @@ export const createActions = (
         properties: {
           filename: {
             type: "string",
+            description: "The filename to create.",
           },
           content: {
             type: "string",
+            description: "The content to write to the file. Never empty.",
           },
         },
       },
@@ -90,6 +144,7 @@ export const createActions = (
         properties: {
           directoryPath: {
             type: "string",
+            description: "The directory path to create.",
           },
         },
       },

@@ -5,11 +5,13 @@
   "dependencies": {
     "commander": "^11.1.0",
     "consola": "^3.2.3",
+    "lodash": "^4.17.21",
     "openai": "^4.19.0",
     "ora": "^7.0.1",
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@types/lodash": "^4.14.201",
     "@types/node": "^20.9.1",
     "bun-types": "latest"
   },
