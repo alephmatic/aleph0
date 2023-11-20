@@ -52,8 +52,6 @@ export const createActions = async (
     },
     expandSnippet: {
       function: async (args: { id: string }) => {
-        console.log("🚀 id:", args.id);
-
         const { file, references } = files[args.id];
 
         const directory = process.cwd();
