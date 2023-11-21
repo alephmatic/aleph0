@@ -57,7 +57,7 @@ export const createActions = async (
           };
         });
 
-        const contents = `## File:
+        const contents = `## Snippet code
 ${fileContents}
 
 ## References:
