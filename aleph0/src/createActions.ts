@@ -1,9 +1,9 @@
 import { z } from "zod";
 import kebabCase from "lodash/kebabCase";
+import { RunnableFunctionWithParse } from "openai/lib/RunnableFunction";
 import { loadSnippets } from "./lib/utils";
 import { createFile, createFolder, readFile } from "./lib/file";
 import { SnippetFile, Technology } from "./types";
-import { RunnableFunctionWithParse } from "openai/lib/RunnableFunction.mjs";
 
 export const createActions = async (
   technology: Technology,
@@ -12,6 +12,7 @@ export const createActions = async (
   const { snippets: snippetsWithoutIds } = await loadSnippets(technology);
   const files: Record<string, SnippetFile> = {};
 
+  // add ids to files for the expandSnippet action
   const snippets = snippetsWithoutIds.map((snippet) => {
     return {
       ...snippet,
@@ -139,36 +140,5 @@ ${reference.contents}`
         },
       },
     },
-    // updateFile: {
-    //   // TODO: Update an existing file using text
-    // },
-    // TODO: Other functions we might need:
-    // readExistingProjectFile, getExistingProjectStrcuture, checkPotentialBugsInFiles, searchForBugSolutionOnline
-    //
-    // We might want to add this:
-    // createTaskDescription: {
-    //   function : async (args: { userPrompt: string }) => {
-    //     return {
-    //       taskDescription: await createTaskDescriptionPrompt(args.userPrompt), //TODO: need to call open AI here
-    //     };
-    //   },
-    //   name: "createTaskDescription",
-    //   description: "Returns a more complete task description before applying actions.",
-    //   parse: (args: string) => {
-    //     return z
-    //       .object({
-    //         userPrompt: z.string(),
-    //       })
-    //       .parse(JSON.parse(args));
-    //   },
-    //   parameters: {
-    //     type: "object",
-    //     properties: {
-    //       userPrompt: {
-    //         type: "string",
-    //       },
-    //     },
-    //   },
-    // },
   };
 };
