@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { loadSnippets } from "./lib/utils";
-import { createFile, createFolder, readFile } from "./lib/file";
+import { createFile, createFolder, readFile, readMetadata } from "./lib/file";
 import { Technology, zodTechnology } from "./types";
 import { RunnableFunctionWithParse } from "openai/lib/RunnableFunction.mjs";
 
@@ -25,7 +25,25 @@ export const createActions = (
         properties: {},
       },
     },
-    readSnippetFile: {
+    readSnippetMetadata: {
+      function: async (args: { filePath: string }) => {
+        return { fileContents: await readMetadata(args.filePath) };
+      },
+      name: "readSnippetMetadata",
+      description: "Returns the contents of a snippet metadata file as JSON.",
+      parse: (args: string) => {
+        return z.object({ filePath: z.string() }).parse(JSON.parse(args));
+      },
+      parameters: {
+        type: "object",
+        properties: {
+          filePath: {
+            type: "string",
+          },
+        },
+      },
+    },
+    readSnippetReference: {
       function: async (args: { filePath: string }) => {
         return { fileContents: readFile(args.filePath) };
       },

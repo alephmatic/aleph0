@@ -2,7 +2,7 @@ import fs from "fs/promises";
 import path from "path";
 import consola from "consola";
 import { Technology, Snippet, SnippetFile } from "../types";
-import { readFile } from "./file";
+import { readMetadata } from "./file";
 
 export async function loadSnippets(technology: Technology) {
   const snippetsDir = path.join("./snippets", technology);
@@ -12,8 +12,8 @@ export async function loadSnippets(technology: Technology) {
   const snippetsData = await Promise.all(
     snippetDirs
       .filter((dir) => dir.isDirectory())
-      .map((dir) => path.join(snippetsDir, dir.name, "metadata.json"))
-      .map((metadataPath) => readFile(metadataPath))
+      .map((dir) => path.join(snippetsDir, dir.name, "metadata.ts"))
+      .map(async (metadataPath) => await readMetadata(metadataPath))
   );
   const technologySnippets: Snippet[] = snippetsData
     .map((metadata) => metadata.replace(/[\n]/g, "").replace(/\s\s/g, ""))
