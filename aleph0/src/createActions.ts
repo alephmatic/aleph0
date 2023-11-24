@@ -1,5 +1,5 @@
 import { z } from "zod";
-import kebabCase from "lodash/kebabCase";
+import _ from "lodash"; // ideally just import kebabCase. but this caused a build error
 import { RunnableFunctionWithParse } from "openai/lib/RunnableFunction";
 import { loadSnippets } from "./lib/utils";
 import { createFile, createFolder, readFile } from "./lib/file";
@@ -17,7 +17,7 @@ export const createActions = async (
     return {
       ...snippet,
       files: snippet.files?.map((file) => {
-        const id = `${kebabCase(snippet.name)}/${kebabCase(file.file)}`;
+        const id = `${_.kebabCase(snippet.name)}/${_.kebabCase(file.file)}`;
         files[id] = file;
         return {
           ...file,

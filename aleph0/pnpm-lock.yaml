@@ -20,9 +20,6 @@ dependencies:
   ora:
     specifier: ^7.0.1
     version: 7.0.1
-  typescript:
-    specifier: ^5.0.0
-    version: 5.2.2
   zod:
     specifier: ^3.22.4
     version: 3.22.4
@@ -36,7 +33,10 @@ devDependencies:
     version: 20.9.2
   tsup:
     specifier: ^8.0.0
-    version: 8.0.0
+    version: 8.0.0(typescript@5.2.2)
+  typescript:
+    specifier: ^5.0.0
+    version: 5.2.2
 
 packages:
 
@@ -1243,7 +1243,7 @@ packages:
     resolution: {integrity: sha512-Y/arvbn+rrz3JCKl9C4kVNfTfSm2/mEp5FSz5EsZSANGPSlQrpRI5M4PKF+mJnE52jOO90PnPSc3Ur3bTQw0gA==}
     dev: true
 
-  /tsup@8.0.0:
+  /tsup@8.0.0(typescript@5.2.2):
     resolution: {integrity: sha512-9rOGn8LsFn2iAg2pCB1jnH7ygVuGjlzIomjw0jKXUxAii3iL5cXgm0jZMPKfFH1bSAjQovJ1DUVPSw+oDuIu8A==}
     engines: {node: '>=18'}
     hasBin: true
@@ -1276,6 +1276,7 @@ packages:
       source-map: 0.8.0-beta.0
       sucrase: 3.34.0
       tree-kill: 1.2.2
+      typescript: 5.2.2
     transitivePeerDependencies:
       - supports-color
       - ts-node
@@ -1285,7 +1286,7 @@ packages:
     resolution: {integrity: sha512-mI4WrpHsbCIcwT9cF4FZvr80QUeKvsUsUvKDoR+X/7XHQH98xYD8YHZg7ANtz2GtZt/CBq2QJ0thkGJMHfqc1w==}
     engines: {node: '>=14.17'}
     hasBin: true
-    dev: false
+    dev: true
 
   /undici-types@5.26.5:
     resolution: {integrity: sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==}

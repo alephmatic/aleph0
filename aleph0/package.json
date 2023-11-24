@@ -1,7 +1,13 @@
 {
   "name": "@alephmatic/aleph0",
-  "module": "src/index.ts",
+  "main": "index.js",
   "type": "module",
+  "bin": {
+    "a0": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsup"
+  },
   "dependencies": {
     "commander": "^11.1.0",
     "consola": "^3.2.3",
@@ -13,16 +19,8 @@
   "devDependencies": {
     "@types/lodash": "^4.14.201",
     "@types/node": "^20.9.2",
-    "tsup": "^8.0.0"
-  },
-  "peerDependencies": {
+    "tsup": "^8.0.0",
     "typescript": "^5.0.0"
-  },
-  "scripts": {
-    "build": "tsup"
-  },
-  "bin": {
-    "a0": "./dist/index.js"
   },
   "license": "MIT",
   "keywords": [
