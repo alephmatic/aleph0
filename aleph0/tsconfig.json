@@ -16,7 +16,7 @@
     "allowJs": true,
     "outDir": "dist",
     "types": [
-      "bun-types" // add Bun global
+      "node"
     ]
   },
   "include": ["src"],

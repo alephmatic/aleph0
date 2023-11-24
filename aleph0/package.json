@@ -12,8 +12,7 @@
   },
   "devDependencies": {
     "@types/lodash": "^4.14.201",
-    "@types/node": "^20.9.1",
-    "bun-types": "latest",
+    "@types/node": "^20.9.2",
     "tsup": "^8.0.0"
   },
   "peerDependencies": {
