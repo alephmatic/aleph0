@@ -1,5 +1,10 @@
-# Next.js AI
+# Aleph0
 
-Build Next.js apps 10x faster with AI.
+Aleph0 is an AI that generates code from natural language.
 
-See aleph0 for docs.
+## Usage
+
+```bash
+export OPENAI_API_KEY=API_KEY
+npx @alephmatic/aleph0 gen "add a form that creates a blog post"
+```
