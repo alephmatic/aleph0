@@ -1,6 +1,6 @@
 {
   "name": "@alephmatic/aleph0",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "private": false,
   "main": "index.js",
   "type": "module",
