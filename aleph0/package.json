@@ -4,9 +4,7 @@
   "private": false,
   "main": "index.js",
   "type": "module",
-  "bin": {
-    "a0": "./dist/index.js"
-  },
+  "bin": "./dist/index.js",
   "scripts": {
     "build": "tsup"
   },
