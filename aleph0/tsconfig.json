@@ -7,7 +7,6 @@
     "moduleDetection": "force",
     "allowImportingTsExtensions": true,
     "noEmit": true,
-    "composite": true,
     "strict": true,
     "downlevelIteration": true,
     "skipLibCheck": true,
@@ -15,9 +14,11 @@
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "allowJs": true,
+    "outDir": "dist",
     "types": [
-      "bun-types" // add Bun global
+      "node"
     ]
   },
+  "include": ["src/**/*"],
   "exclude": ["snippets"]
 }
