@@ -1,32 +1,23 @@
-# aleph0
+# Aleph0
 
-To install dependencies:
+Aleph0 is an AI that generates code from natural language.
 
-```bash
-pnpm install
-```
-
-To run:
+## Usage
 
 ```bash
-pnpm run src/index.ts
-bun src/index.ts
+export OPENAI_API_KEY=API_KEY
+npx @alephmatic/aleph0 gen "add a form that creates a blog post"
 ```
 
-## Test cases
+Or with global install:
 
 ```bash
-CONSOLA_LEVEL=4 pnpm src/index.ts gen "add a form that creates a blog post" -p ../examples/next
-CONSOLA_LEVEL=4 pnpm src/index.ts gen "create a prisma schema file with a blog model" -p ../examples/next
+npm install -g @alephmatic/aleph0
+export OPENAI_API_KEY=API_KEY
+aleph0 gen "create a blog"
 ```
 
-## Debug
-
-```bash
-CONSOLA_LEVEL=4 pnpm run src/index.ts gen "add a file named agam.ts in the app/ folder" -p ../examples/next -rd false
-```
-
-## Snippets in aleph0
+## Snippets
 
 ### Overview
 
