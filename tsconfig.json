@@ -19,6 +19,6 @@
       "node"
     ]
   },
-  "include": ["src/**/*"],
-  "exclude": ["snippets"]
+  "include": ["./src/**/*"],
+  "exclude": ["./snippets"]
 }

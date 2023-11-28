@@ -1,19 +1,6 @@
-A component is UI that is reusale. You can define components by exporting a component from a component.tsx file. 
+import * as React from "react";
 
-Path:
-[next-project-path]/ 
-  app/
-  components/ <--  place new components here.
-
-File Path Examples:
-app/components/ui/Label.tsx
-
-Component file content example snippet:
-```tsx
-// `app/components.tsx` is the UI for the `/` URL
-import * as React from "react"
-
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 export interface InputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {}
@@ -30,16 +17,9 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         ref={ref}
         {...props}
       />
-    )
+    );
   }
-)
-Input.displayName = "Input"
+);
+Input.displayName = "Input";
 
-export { Input }
-```
-
-Rules:
-.jsx, or .tsx file extensions can be used for Components.
-A component is always the leaf of the route subtree.
-Use the existing next-project/components directory as it most likely exists.
-Create a new folder for new components under `components/` directory (not under `components/ui` though).
+export { Input };

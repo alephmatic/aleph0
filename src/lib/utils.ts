@@ -2,7 +2,11 @@ import fs from "fs/promises";
 import path from "path";
 import consola from "consola";
 import { Technology, Snippet, SnippetFile } from "../types";
-import { readFile } from "./file";
+
+export async function readMetadata(filePath: string) {
+  const metadata = await import(path.join("..", "..", filePath)); // TODO: fix this
+  return JSON.stringify(metadata);
+}
 
 export async function loadSnippets(technology: Technology) {
   const snippetsDir = path.join("./snippets", technology);
@@ -12,12 +16,13 @@ export async function loadSnippets(technology: Technology) {
   const snippetsData = await Promise.all(
     snippetDirs
       .filter((dir) => dir.isDirectory())
-      .map((dir) => path.join(snippetsDir, dir.name, "metadata.json"))
-      .map((metadataPath) => readFile(metadataPath))
+      .map((dir) => path.join(snippetsDir, dir.name, "metadata.ts"))
+      .map(async (metadataPath) => await readMetadata(metadataPath))
   );
   const technologySnippets: Snippet[] = snippetsData
     .map((metadata) => metadata.replace(/[\n]/g, "").replace(/\s\s/g, ""))
     .map((metadata) => JSON.parse(metadata))
+    .map((metadata) => metadata.metadata)
     .map((metadata) => ({
       ...metadata,
       path: path.join("./snippets", technology, metadata.path) + "/",

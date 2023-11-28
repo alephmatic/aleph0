@@ -1,9 +1,10 @@
 import { z } from "zod";
 import _ from "lodash"; // ideally just import kebabCase. but this caused a build error
 import { RunnableFunctionWithParse } from "openai/lib/RunnableFunction";
-import { loadSnippets } from "./lib/utils";
+import { loadSnippets, readMetadata } from "./lib/utils";
 import { createFile, createFolder, readFile } from "./lib/file";
 import { SnippetFile, Technology } from "./types";
+import consola from "consola";
 
 export const createActions = async (
   technology: Technology,
@@ -13,6 +14,7 @@ export const createActions = async (
   const files: Record<string, SnippetFile> = {};
 
   // add ids to files for the expandSnippet action
+  consola.debug("Creating snippets map...");
   const snippets = snippetsWithoutIds.map((snippet) => {
     return {
       ...snippet,
@@ -26,6 +28,7 @@ export const createActions = async (
       }),
     };
   });
+  consola.debug("\rCreating snippets map... done");
 
   return {
     getSnippets: {
@@ -72,7 +75,8 @@ ${reference.contents}`
         return contents;
       },
       name: "expandSnippet",
-      description: "Returns the contents and references of a snippet file.",
+      description:
+        "Returns the contents and references contents of a snippet file.",
       parse: (args: string) => {
         return z.object({ id: z.string() }).parse(JSON.parse(args));
       },
