@@ -10,6 +10,7 @@ To run:
 
 ```bash
 pnpm run src/index.ts
+bun src/index.ts
 ```
 
 ## Test cases

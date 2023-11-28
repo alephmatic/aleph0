@@ -6,11 +6,6 @@ export function readFile(filePath: string) {
   return fs.readFileSync(filePath, "utf-8");
 }
 
-export async function readMetadata(filePath: string) {
-  const metadata = await import(path.join("..", "..", filePath)); // TODO: fix this
-  return JSON.stringify(metadata);
-}
-
 // from: https://github.com/nicoalbanese/kirimase/blob/master/src/utils.ts
 
 export function createFile(filePath: string, content: string) {

@@ -1,9 +1,10 @@
 import { z } from "zod";
 import _ from "lodash"; // ideally just import kebabCase. but this caused a build error
 import { RunnableFunctionWithParse } from "openai/lib/RunnableFunction";
-import { loadSnippets } from "./lib/utils";
-import { createFile, createFolder, readFile, readMetadata } from "./lib/file";
+import { loadSnippets, readMetadata } from "./lib/utils";
+import { createFile, createFolder, readFile } from "./lib/file";
 import { SnippetFile, Technology } from "./types";
+import consola from "consola";
 
 export const createActions = async (
   technology: Technology,
@@ -13,6 +14,7 @@ export const createActions = async (
   const files: Record<string, SnippetFile> = {};
 
   // add ids to files for the expandSnippet action
+  consola.debug("Creating snippets map...");
   const snippets = snippetsWithoutIds.map((snippet) => {
     return {
       ...snippet,
@@ -26,6 +28,7 @@ export const createActions = async (
       }),
     };
   });
+  consola.debug("\rCreating snippets map... done");
 
   return {
     getSnippets: {
@@ -43,55 +46,37 @@ export const createActions = async (
         properties: {},
       },
     },
-    readSnippetMetadata: {
-      function: async (args: { filePath: string }) => {
-        return { fileContents: await readMetadata(args.filePath) };
+    expandSnippet: {
+      function: async (args: { id: string }) => {
+        const { file, references } = files[args.id];
+
+        const directory = process.cwd();
+
+        const filePath = `${directory}/${file}`;
+        const fileContents = readFile(filePath);
+        const referenceContents = references?.map((reference) => {
+          return {
+            name: reference,
+            contents: readFile(`${directory}/${reference}`),
+          };
+        });
+
+        const contents = `## Snippet code
+${fileContents}
+
+## References:
+
+${referenceContents?.map(
+  (reference) => `### ${reference.name}
+${reference.contents}`
+)}
+`;
+
+        return contents;
       },
-      name: "readSnippetMetadata",
-      description: "Returns the contents of a snippet metadata file as JSON.",
-      parse: (args: string) => {
-        return z.object({ filePath: z.string() }).parse(JSON.parse(args));
-      },
-      parameters: {
-        type: "object",
-        properties: {
-          filePath: {
-            type: "string",
-          },
-        },
-      },
-    },
-    readSnippetReference: {
-      function: async (args: { filePath: string }) => {
-        return { fileContents: readFile(args.filePath) };
-        //         const { file, references } = files[args.id];
-
-        //         const directory = process.cwd();
-
-        //         const filePath = `${directory}/${file}`;
-        //         const fileContents = readFile(filePath);
-        //         const referenceContents = references?.map((reference) => {
-        //           return {
-        //             name: reference,
-        //             contents: readFile(`${directory}/${reference}`),
-        //           };
-        //         });
-
-        //         const contents = `## Snippet code
-        // ${fileContents}
-
-        // ## References:
-
-        // ${referenceContents?.map(
-        //   (reference) => `### ${reference.name}
-        // ${reference.contents}`
-        // )}
-        // `;
-
-        //         return contents;
-      },
-      name: "readSnippetReference",
-      description: "Returns the contents and references of a snippet file.",
+      name: "expandSnippet",
+      description:
+        "Returns the contents and references contents of a snippet file.",
       parse: (args: string) => {
         return z.object({ id: z.string() }).parse(JSON.parse(args));
       },
@@ -100,7 +85,7 @@ export const createActions = async (
         properties: {
           id: {
             type: "string",
-            description: "The file path of the snippet file.",
+            description: "The id of the snippet file.",
           },
         },
       },
