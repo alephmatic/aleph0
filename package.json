@@ -6,6 +6,8 @@
   "type": "module",
   "bin": "./dist/index.js",
   "scripts": {
+    "watch": "tsup --watch",
+    "start": "node dist/index.js",
     "build": "tsup"
   },
   "dependencies": {

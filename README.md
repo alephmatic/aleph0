@@ -17,6 +17,8 @@ export OPENAI_API_KEY=API_KEY
 aleph0 gen "create a blog"
 ```
 
+If you'd like to clone this repo locally and run it see `CONTRIBUTING.md` on how to use it.
+
 ## Snippets
 
 ### Overview
