@@ -1,6 +1,7 @@
 import { existsSync, mkdirSync, copySync } from "fs-extra";
 import { join } from "path";
 import { GenerateOptions, generate } from "../src/generate";
+import { test, expect } from "@playwright/test";
 
 // End-to-end test function
 async function testCLI() {
@@ -30,5 +31,13 @@ async function testCLI() {
   );
 }
 
-// Execute the test
-testCLI();
+test("Hello test", async ({ page }) => {
+  // Execute the test
+  testCLI();
+
+  await page.goto("http://localhost:3000/hello");
+  await expect(page).toHaveTitle(/button/);
+  // test if clicking the button sends an api request
+  await page.click("text=button");
+  await expect(page).toHaveText("Hello aleph0");
+});
