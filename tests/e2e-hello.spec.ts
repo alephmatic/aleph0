@@ -13,12 +13,12 @@ async function testCLI() {
     copySync(examplesDir, tempDir);
   }
 
-  const options = {
+  const options: GenerateOptions = {
     projectDir: tempDir,
     regenerateDescription: true,
     technology: "next14",
     model: "gpt-4-1106-preview",
-  } as GenerateOptions;
+  };
 
   generate("create an api at /api/hello that returns 'Hello aleph0'", options);
   generate(
