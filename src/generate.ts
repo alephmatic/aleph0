@@ -3,7 +3,7 @@ import { completeTask } from "./completeTask";
 import { Technology } from "./types";
 import { generateDescription } from "./generateDescription";
 
-type GenerateOptions = {
+export type GenerateOptions = {
   projectDir: string;
   technology: Technology;
   regenerateDescription: boolean;
