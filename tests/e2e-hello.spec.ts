@@ -20,8 +20,11 @@ async function testCLI() {
     model: "gpt-4-1106-preview",
   };
 
-  generate("create an api at /api/hello that returns 'Hello aleph0'", options);
-  generate(
+  await generate(
+    "create an api at /api/hello that returns 'Hello aleph0'",
+    options
+  );
+  await generate(
     "create a page at /hello with a button that calls the api at /api/hello and displays it",
     options
   );
