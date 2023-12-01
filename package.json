@@ -9,7 +9,7 @@
     "watch": "tsup --watch",
     "start": "node dist/index.js",
     "build": "tsup",
-    "test:e2e": "pnpm exec playwright test"
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "commander": "^11.1.0",
