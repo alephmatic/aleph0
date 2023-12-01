@@ -19,7 +19,7 @@ export const functionCallPrompt = (options: { userPrompt: string }) => {
   
   * Make sure you use the relevant snippets only for the task. Use the snippets metadata to understand what each snippet does.
   * Assume that the basic strucure of the project has already been created.
-  * When writing or reading files, use the relative paths.
+  * When writing or reading files, use the relative paths (cwd: ${process.cwd()}).
   * You must not derive data from thin air if you are able to do so by using one of the provided functions, e.g. readSnippet.
   * If a snippet contains a reference, read that reference file and use it together with the snippet file.
   * Make sure you use all files in a snippet and create all corresponding files in the project.`;

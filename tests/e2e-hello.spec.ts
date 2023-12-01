@@ -1,4 +1,4 @@
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 import { existsSync, mkdirSync, cpSync } from "fs";
 import { join } from "path";
 import { test, expect } from "@playwright/test";
@@ -14,6 +14,7 @@ async function testCLI() {
 
     const examplesDir = join(process.cwd(), "./examples/next");
     cpSync(examplesDir, tempDir, { recursive: true });
+    console.log("Done copying examples/next to tests/temp");
   }
 
   const options: GenerateOptions = {
