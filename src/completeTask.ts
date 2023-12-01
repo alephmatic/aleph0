@@ -1,8 +1,8 @@
-import OpenAI from "openai";
 import consola from "consola";
 import { createActions } from "./createActions";
 import { functionCallPrompt } from "./prompts";
 import { Technology } from "./types";
+import { openai } from "./openai";
 
 export const completeTask = async (
   userPrompt: string,
@@ -12,8 +12,6 @@ export const completeTask = async (
     model?: string;
   }
 ) => {
-  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
   let lastFunctionResult: null | { errorMessage: string } | { query: string } =
     null;
 
