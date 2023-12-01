@@ -10,6 +10,9 @@ export default defineConfig({
   // Reporter to use
   reporter: "html",
 
+  // Timeout of each test - give more time for AI to finish
+  timeout: 180_000,
+
   // Configure projects for major browsers.
   projects: [
     {
