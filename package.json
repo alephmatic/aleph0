@@ -9,7 +9,7 @@
     "watch": "tsup --watch",
     "start": "node dist/index.js",
     "build": "tsup",
-    "test:e2e": "bunx playwright test"
+    "test:e2e": "pnpm exec playwright test"
   },
   "dependencies": {
     "commander": "^11.1.0",
@@ -23,7 +23,6 @@
     "@playwright/test": "^1.40.1",
     "@types/lodash": "^4.14.201",
     "@types/node": "^20.9.2",
-    "fs-extra": "^11.2.0",
     "tsup": "^8.0.0",
     "typescript": "^5.0.0"
   },
