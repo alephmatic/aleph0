@@ -1,7 +1,9 @@
+import dotenv from 'dotenv';
 import { existsSync, mkdirSync, cpSync } from "fs";
 import { join } from "path";
-import { GenerateOptions, generate } from "../src/generate";
 import { test, expect } from "@playwright/test";
+import { GenerateOptions, generate } from "../src/generate";
+dotenv.config();
 
 // End-to-end test function
 async function testCLI() {
