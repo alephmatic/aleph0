@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, copySync } from "fs-extra";
+import { existsSync, mkdirSync, copyFileSync } from "fs";
 import { join } from "path";
 import { GenerateOptions, generate } from "../src/generate";
 import { test, expect } from "@playwright/test";
@@ -6,12 +6,12 @@ import { test, expect } from "@playwright/test";
 // End-to-end test function
 async function testCLI() {
   // Step 1: Create a temp directory
-  const tempDir = join(__dirname, "temp");
+  const tempDir = join(process.cwd(), "./tests/temp");
   if (!existsSync(tempDir)) {
     mkdirSync(tempDir);
 
-    const examplesDir = join(__dirname, "../examples/next/");
-    copySync(examplesDir, tempDir);
+    const examplesDir = join(process.cwd(), "./examples/next");
+    copyFileSync(examplesDir, tempDir);
   }
 
   const options: GenerateOptions = {
@@ -31,10 +31,9 @@ async function testCLI() {
   );
 }
 
-test("Hello test", async ({ page }) => {
-  // Execute the test
-  testCLI();
+testCLI();
 
+test("Hello test", async ({ page }) => {
   await page.goto("http://localhost:3000/hello");
   await expect(page).toHaveTitle(/button/);
   // test if clicking the button sends an api request
