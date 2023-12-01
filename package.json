@@ -9,7 +9,8 @@
     "watch": "tsup --watch",
     "start": "node dist/index.js",
     "build": "tsup",
-    "test:e2e": "PLAYWRIGHT_TEST=true playwright test"
+    "test:e2e": "PLAYWRIGHT_TEST=true playwright test",
+    "temp-test": "rm -rf ./tests/temp && mkdir -p ./examples/temp && cp -r ./examples/next ./tests/temp && cd tests/temp/ && npm run dev"
   },
   "dependencies": {
     "commander": "^11.1.0",
@@ -24,6 +25,7 @@
     "@playwright/test": "^1.40.1",
     "@types/lodash": "^4.14.201",
     "@types/node": "^20.9.2",
+    "execa": "^8.0.1",
     "tsup": "^8.0.0",
     "typescript": "^5.0.0"
   },

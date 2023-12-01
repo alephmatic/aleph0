@@ -23,5 +23,5 @@ export async function generate(
 
   const result = await completeTask(userPrompt, options);
 
-  consola.info("Result:", result);
+  consola.info("Final result:", result);
 }

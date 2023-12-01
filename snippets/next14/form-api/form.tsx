@@ -28,7 +28,7 @@ import {
   UserProfileBody,
 } from "@/app/api/user/settings/validation";
 
-export function ProfileForm() {
+export function FormComponentName() {
   const { toast } = useToast();
 
   const form = useForm<UserProfileBody>({
