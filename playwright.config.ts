@@ -13,6 +13,10 @@ export default defineConfig({
   // Timeout of each test - give more time for AI to finish
   timeout: 180_000,
 
+  use: {
+    baseURL: "http://localhost:3000",
+  },
+
   // Configure projects for major browsers.
   projects: [
     {
