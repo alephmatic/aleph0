@@ -47,6 +47,10 @@ snippets/
       toaster.tsx - Example of a toaster in Next.js version 14.
 ```
 
+## Conventions
+
+- For placeholders use this format: `_PLACEHOLDER_HERE_`.
+
 ## Example metadata.ts
 
 ```ts
@@ -64,7 +68,7 @@ multiline`,
       name: "Toaster Component",
       file: "toaster.tsx",
       explanation:
-        "The toaster should be placed on the frontend in a `toasters/<TOASTER>.ts` file.",
+        "The toaster should be placed on the frontend in a `toasters/_TOASTER_NAME_.ts` file.",
       references: ["page.tsx"], // extra information related to the snippet like next.js's `page.tsx` conventions.
     },
   ],

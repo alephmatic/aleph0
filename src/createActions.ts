@@ -5,6 +5,8 @@ import { loadSnippets, readMetadata } from "./lib/utils";
 import { createFile, createFolder, readFile } from "./lib/file";
 import { SnippetFile, Technology } from "./types";
 import consola from "consola";
+import fs from "fs";
+import path from "path";
 
 export const createActions = async (
   technology: Technology,
@@ -29,7 +31,6 @@ export const createActions = async (
     };
   });
   consola.debug("\rCreating snippets map... done");
-
   return {
     getSnippets: {
       function: async (_args: {}) => {
@@ -118,6 +119,46 @@ ${reference.contents}`
             description: "The content to write to the file. Never empty.",
           },
         },
+      },
+    },
+    listExsitingProjectFiles: {
+      function: async (args: {}) => {
+        let filesToCheck: string[] = [projectRoot];
+        let fileList: string[] = [];
+
+        while (filesToCheck.length > 0) {
+          const currentPath = filesToCheck.shift()!;
+
+          if (
+            currentPath.includes("node_modules") ||
+            currentPath.includes(".git") ||
+            currentPath.includes(".next")
+          ) {
+            continue;
+          }
+
+          const stats = fs.statSync(currentPath);
+
+          if (stats.isDirectory()) {
+            fs.readdirSync(currentPath).forEach((file) => {
+              filesToCheck.push(path.join(currentPath, file));
+            });
+          } else {
+            fileList.push(currentPath);
+          }
+        }
+
+        return fileList;
+      },
+      name: "listExistingProjectFiles",
+      description:
+        "Returns a list of files already present in the project directory (used to help read files you can reference and use like components).",
+      parse: (args: string) => {
+        return z.object({}).parse(JSON.parse(args));
+      },
+      parameters: {
+        type: "object",
+        properties: {},
       },
     },
     createDirectory: {

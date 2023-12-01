@@ -1,5 +1,5 @@
-import { FormComponentName } from "@/components/form/<FORM>.ts";
+import { _FORM_COMPONENT_NAME_HERE_ } from "@/components/form/<FORM>.tsx";
 
 export default function Home() {
-  return <FormComponentName />;
+  return <_FORM_COMPONENT_NAME_HERE_ />;
 }
