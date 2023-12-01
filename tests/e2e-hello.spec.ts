@@ -53,8 +53,6 @@ test.only("Hello test", async ({ page, request }) => {
 });
 
 test("Create blog test", async ({ page, request }) => {
-  createTempDir(options.projectDir);
-
   await generate("add a form that creates a blog post", options);
 
   // Test the result is correct
