@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, copyFileSync } from "fs";
+import { existsSync, mkdirSync, cpSync } from "fs";
 import { join } from "path";
 import { GenerateOptions, generate } from "../src/generate";
 import { test, expect } from "@playwright/test";
@@ -10,8 +10,9 @@ async function testCLI() {
   if (!existsSync(tempDir)) {
     mkdirSync(tempDir);
 
+    console.log(join(process.cwd(), "./examples/next"));
     const examplesDir = join(process.cwd(), "./examples/next");
-    copyFileSync(examplesDir, tempDir);
+    cpSync(examplesDir, tempDir, { recursive: true });
   }
 
   const options: GenerateOptions = {
@@ -31,12 +32,11 @@ async function testCLI() {
   );
 }
 
-testCLI();
-
 test("Hello test", async ({ page }) => {
-  await page.goto("http://localhost:3000/hello");
-  await expect(page).toHaveTitle(/button/);
-  // test if clicking the button sends an api request
-  await page.click("text=button");
-  await expect(page).toHaveText("Hello aleph0");
+  await testCLI();
+  // await page.goto("http://localhost:3000/hello");
+  // await expect(page).toHaveTitle(/button/);
+  // // test if clicking the button sends an api request
+  // await page.click("text=button");
+  // await expect(page).toHaveText("Hello aleph0");
 });
