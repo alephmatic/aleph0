@@ -10,7 +10,6 @@ async function testCLI() {
   if (!existsSync(tempDir)) {
     mkdirSync(tempDir);
 
-    console.log(join(process.cwd(), "./examples/next"));
     const examplesDir = join(process.cwd(), "./examples/next");
     cpSync(examplesDir, tempDir, { recursive: true });
   }
