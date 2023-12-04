@@ -33,7 +33,7 @@ test.only("Hello test", async ({ page, request }) => {
   );
 
   await page.goto("/hello");
-  const button = page.locator("button");
+  const button = page.locator("button").first();
   await button.click();
   await expect(page.locator("body")).toHaveText("Hello aleph0");
 });
