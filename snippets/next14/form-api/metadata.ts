@@ -10,7 +10,7 @@ export const metadata: Metadata = {
       name: "Form component",
       file: "form.tsx",
       explanation:
-        "The form component should be placed in the components directory as `components/form/_FORM_.tsx` file. Make sure to use only necessary inputs requested. Use the referencce file but don't blindly copy it 1:1.",
+        "The form component should be placed in the components directory as `components/form/_FORM_.tsx` file. Make sure to use only necessary inputs requested. Use the referencce file but don't blindly copy it 1:1 - it should cover what the user asked for.",
       references: ["component.tsx"],
     },
     {
