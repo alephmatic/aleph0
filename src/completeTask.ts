@@ -1,7 +1,7 @@
 import consola from "consola";
 import { createActions } from "./createActions";
 import { functionCallPrompt } from "./prompts";
-import { Technology } from "./types";
+import { ActionList, Technology } from "./types";
 import { openai } from "./openai";
 
 export const completeTask = async (
@@ -11,18 +11,21 @@ export const completeTask = async (
     projectDir: string;
     model?: string;
   }
-) => {
+): Promise<ActionList> => {
   let lastFunctionResult: null | { errorMessage: string } | { query: string } =
     null;
 
   const promptString = functionCallPrompt({ userPrompt });
-  const actions = await createActions(options.technology, options.projectDir);
+  const actionFactory = await createActions(
+    options.technology,
+    options.projectDir
+  );
 
   const runner = openai.beta.chat.completions
     .runFunctions({
       model: options?.model ?? "gpt-4-1106-preview",
       messages: [{ role: "user", content: promptString }],
-      functions: Object.values(actions),
+      functions: Object.values(actionFactory.availableActions),
       temperature: 0,
       frequency_penalty: 0,
     })
@@ -33,6 +36,6 @@ export const completeTask = async (
   const finalContent = await runner.finalContent();
 
   consola.debug("> finalContent", finalContent);
-
   consola.debug("> lastFunctionResult", lastFunctionResult);
+  return actionFactory.actionList;
 };

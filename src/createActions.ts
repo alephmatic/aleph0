@@ -3,7 +3,7 @@ import _ from "lodash"; // ideally just import kebabCase. but this caused a buil
 import { RunnableFunctionWithParse } from "openai/lib/RunnableFunction";
 import { loadSnippets, readMetadata } from "./lib/utils";
 import { createFile, createFolder, readFile } from "./lib/file";
-import { SnippetFile, Technology } from "./types";
+import { ActionList, SnippetFile, Technology } from "./types";
 import consola from "consola";
 import fs from "fs";
 import path from "path";
@@ -11,9 +11,13 @@ import path from "path";
 export const createActions = async (
   technology: Technology,
   projectRoot: string
-): Promise<Record<string, RunnableFunctionWithParse<any>>> => {
+): Promise<{
+  actionList: ActionList;
+  availableActions: Record<string, RunnableFunctionWithParse<any>>;
+}> => {
   const { snippets: snippetsWithoutIds } = await loadSnippets(technology);
   const files: Record<string, SnippetFile> = {};
+  const actionList: ActionList = [];
 
   // add ids to files for the expandSnippet action
   consola.debug("Creating snippets map...");
@@ -31,7 +35,8 @@ export const createActions = async (
     };
   });
   consola.debug("\rCreating snippets map... done");
-  return {
+
+  const availableActions = {
     getSnippets: {
       function: async (_args: {}) => {
         return snippets;
@@ -56,6 +61,10 @@ export const createActions = async (
         const filePath = `${directory}/${file}`;
         const fileContents = readFile(filePath);
         const referenceContents = references?.map((reference) => {
+          actionList.push({
+            action: "read",
+            path: `${directory}/${reference}`,
+          });
           return {
             name: reference,
             contents: readFile(`${directory}/${reference}`),
@@ -93,6 +102,10 @@ ${reference.contents}`
     },
     createFile: {
       function: async (args: { filename: string; content: string }) => {
+        actionList.push({
+          action: "create",
+          path: `${projectRoot}/${args.filename}`,
+        });
         createFile(`${projectRoot}/${args.filename}`, args.content);
         return { success: true };
       },
@@ -163,6 +176,10 @@ ${reference.contents}`
     },
     createDirectory: {
       function: async (args: { directoryPath: string }) => {
+        actionList.push({
+          action: "createDir",
+          path: `${projectRoot}/${args.directoryPath}`,
+        });
         createFolder(`${projectRoot}/${args.directoryPath}`);
         return { success: true };
       },
@@ -185,5 +202,10 @@ ${reference.contents}`
         },
       },
     },
+  };
+
+  return {
+    actionList,
+    availableActions,
   };
 };

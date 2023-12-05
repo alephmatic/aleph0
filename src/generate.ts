@@ -1,6 +1,6 @@
 import consola from "consola";
 import { completeTask } from "./completeTask";
-import { Technology } from "./types";
+import { ActionList, Technology } from "./types";
 import { generateDescription } from "./generateDescription";
 
 export type GenerateOptions = {
@@ -13,7 +13,7 @@ export type GenerateOptions = {
 export async function generate(
   originalUserPrompt: string,
   options: GenerateOptions
-) {
+): Promise<ActionList> {
   consola.start("Creating:", originalUserPrompt, "\n");
 
   const userPrompt = await generateDescription(
@@ -21,7 +21,8 @@ export async function generate(
     options.regenerateDescription
   );
 
-  const result = await completeTask(userPrompt, options);
+  const actions = await completeTask(userPrompt, options);
 
-  consola.info("Final result:", result);
+  consola.info("Final actions:", actions);
+  return actions;
 }

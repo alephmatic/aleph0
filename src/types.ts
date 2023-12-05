@@ -38,3 +38,12 @@ export type FunctionCallingResult = {
   query?: string;
   errorMessage?: string;
 };
+
+const ActionTypeSchema = z.enum(["create", "read", "createDir"]);
+const ActionListSchema = z.array(
+  z.object({
+    action: ActionTypeSchema,
+    path: z.any().optional(),
+  })
+);
+export type ActionList = z.infer<typeof ActionListSchema>;
