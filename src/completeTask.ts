@@ -12,9 +12,6 @@ export const completeTask = async (
     model?: string;
   }
 ): Promise<ActionList> => {
-  let lastFunctionResult: null | { errorMessage: string } | { query: string } =
-    null;
-
   const promptString = functionCallPrompt({ userPrompt });
   const actionFactory = await createActions(
     options.technology,
@@ -36,6 +33,5 @@ export const completeTask = async (
   const finalContent = await runner.finalContent();
 
   consola.debug("> finalContent", finalContent);
-  consola.debug("> lastFunctionResult", lastFunctionResult);
   return actionFactory.actionList;
 };
