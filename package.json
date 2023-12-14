@@ -9,8 +9,8 @@
     "watch": "tsup --watch",
     "start": "node dist/index.js",
     "build": "tsup",
-    "test:e2e": "PLAYWRIGHT_TEST=true playwright test",
-    "init-e2e-test": "rm -rf ./tests/temp && cp -r ./examples/next ./tests/temp && cd tests/temp/ && npm run dev"
+    "test:e2e-init": "rm -rf ./tests/temp && cp -r ./examples/next ./tests/temp && cd tests/temp/ && npm run dev",
+    "test:e2e": "PLAYWRIGHT_TEST=true playwright test"
   },
   "dependencies": {
     "commander": "^11.1.0",
