@@ -29,9 +29,8 @@ Snippets are key components in aleph0, providing valuable context to the AI. The
 
 - **Location**: Snippets are located in the `snippets` folder.
 - **Types of Snippets**:
-  - **General Technology Snippets**: These explain general aspects of a framework. For instance how `page.tsx` is a special file in Next.js.
   - **Metadata.ts**: This file contains details about the snippet, like its purpose, file paths, and references to framework-related files. It helps the AI understand the snippet's context.
-  - **Code Examples**: Other files in the snippets directory typically contain raw code examples showing how to implement the snippet.
+  - **Code Examples**: Contain raw code examples showing how to implement the snippet.
 
 ### Example Structure
 
