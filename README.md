@@ -47,6 +47,10 @@ snippets/
       toaster.tsx - Example of a toaster in Next.js version 14.
 ```
 
+## Conventions
+
+- For placeholders use this format: `_PLACEHOLDER_HERE_`.
+
 ## Example metadata.ts
 
 ```ts
@@ -64,9 +68,55 @@ multiline`,
       name: "Toaster Component",
       file: "toaster.tsx",
       explanation:
-        "The toaster should be placed on the frontend in a `toasters/<TOASTER>.ts` file.",
+        "The toaster should be placed on the frontend in a `toasters/_TOASTER_NAME_.ts` file.",
       references: ["page.tsx"], // extra information related to the snippet like next.js's `page.tsx` conventions.
     },
   ],
 };
+```
+
+## Contributing to Aleph0
+
+### Getting Started
+
+```bash
+pnpm install
+```
+
+To run with `bun`:
+
+```bash
+export OPENAI_API_KEY=API_KEY
+bun run src/index.ts gen "add a form that creates a blog post"
+```
+
+Alternatively use `tsx`:
+
+```bash
+npx tsx src/index.ts gen "add a form that creates a blog post"
+```
+
+If you want to test the exact build output with `tsup`:
+
+```bash
+pnpm run watch
+# in another terminal:
+pnpm run start
+```
+
+### Test cases
+
+Some test cases to try out:
+
+```bash
+npx tsx src/index.ts gen "add a form that creates a blog post" -p ./examples/next
+npx tsx src/index.ts gen "create a prisma schema file with a blog model" -p ./examples/next
+```
+
+### Debug
+
+You can set `CONSOLA_LEVEL=4` to see debug logs and see what the AI is doing at each step:
+
+```bash
+CONSOLA_LEVEL=4 npx tsx src/index.ts gen "add a file named agam.ts in the app/ folder" -p ./examples/next -rd false
 ```

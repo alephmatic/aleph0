@@ -8,19 +8,25 @@
   "scripts": {
     "watch": "tsup --watch",
     "start": "node dist/index.js",
-    "build": "tsup"
+    "build": "tsup",
+    "test:e2e-init": "rm -rf ./tests/temp && cp -r ./examples/next ./tests/temp && cd tests/temp/ && npm run dev",
+    "test:e2e": "DEBUG=1 PLAYWRIGHT_TEST=true playwright test"
   },
   "dependencies": {
+    "@inquirer/prompts": "^3.3.0",
     "commander": "^11.1.0",
     "consola": "^3.2.3",
+    "dotenv": "^16.3.1",
     "lodash": "^4.17.21",
     "openai": "^4.19.0",
     "ora": "^7.0.1",
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@playwright/test": "^1.40.1",
     "@types/lodash": "^4.14.201",
     "@types/node": "^20.9.2",
+    "execa": "^8.0.1",
     "tsup": "^8.0.0",
     "typescript": "^5.0.0"
   },

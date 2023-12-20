@@ -1,18 +1,21 @@
+import dotenv from 'dotenv';
 import consola from "consola";
 import OpenAI from "openai";
 import ora from "ora";
 import { ChatCompletionMessageParam } from "openai/resources/index.mjs";
+dotenv.config();
 
-const openai = new OpenAI({
-  apiKey: process.env["OPENAI_API_KEY"],
-});
+export const openai = new OpenAI();
 
 export async function ai(
   content: string,
   instructions?: string,
   model: "gpt-3.5-turbo" | "gpt-4" = "gpt-3.5-turbo"
 ): Promise<string> {
-  const spinner = ora("Calling OpenAI\n").start();
+  const spinner = ora({
+    text: "Calling OpenAI\n",
+    isEnabled: process.env.PLAYWRIGHT_TEST !== "true",
+  }).start();
 
   consola.debug("OpenAI content:", content);
 

@@ -22,6 +22,13 @@ program
     "The model to use. eg. gpt-4-1106-preview",
     "gpt-4-1106-preview"
   )
-  .action(generate);
+  .option(
+    "-c, --confirm-actions",
+    "Whether to confirm the actions before executing them",
+    true
+  )
+  .action((originalUserPrompt, options) => {
+    generate(originalUserPrompt, options);
+  });
 
 program.parse(process.argv);

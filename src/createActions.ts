@@ -1,17 +1,25 @@
 import { z } from "zod";
 import _ from "lodash"; // ideally just import kebabCase. but this caused a build error
 import { RunnableFunctionWithParse } from "openai/lib/RunnableFunction";
-import { loadSnippets, readMetadata } from "./lib/utils";
-import { createFile, createFolder, readFile } from "./lib/file";
-import { SnippetFile, Technology } from "./types";
 import consola from "consola";
+import fs from "fs";
+import path from "path";
+import { select, input } from "@inquirer/prompts";
+import { loadSnippets } from "./lib/utils";
+import { createFile, createFolder, readFile } from "./lib/file";
+import { ActionList, SnippetFile, Technology } from "./types";
 
 export const createActions = async (
   technology: Technology,
-  projectRoot: string
-): Promise<Record<string, RunnableFunctionWithParse<any>>> => {
+  projectRoot: string,
+  confirmActions?: boolean
+): Promise<{
+  actionList: ActionList;
+  availableActions: Record<string, RunnableFunctionWithParse<any>>;
+}> => {
   const { snippets: snippetsWithoutIds } = await loadSnippets(technology);
   const files: Record<string, SnippetFile> = {};
+  const actionList: ActionList = [];
 
   // add ids to files for the expandSnippet action
   consola.debug("Creating snippets map...");
@@ -30,7 +38,7 @@ export const createActions = async (
   });
   consola.debug("\rCreating snippets map... done");
 
-  return {
+  const availableActions = {
     getSnippets: {
       function: async (_args: {}) => {
         return snippets;
@@ -55,6 +63,10 @@ export const createActions = async (
         const filePath = `${directory}/${file}`;
         const fileContents = readFile(filePath);
         const referenceContents = references?.map((reference) => {
+          actionList.push({
+            action: "read",
+            path: `${directory}/${reference}`,
+          });
           return {
             name: reference,
             contents: readFile(`${directory}/${reference}`),
@@ -92,8 +104,21 @@ ${reference.contents}`
     },
     createFile: {
       function: async (args: { filename: string; content: string }) => {
-        createFile(`${projectRoot}/${args.filename}`, args.content);
-        return { success: true };
+        const { performAction, fixToMake } = await confirmAction({
+          message: `Content: ${args.content}\n\nCreate file ${args.filename}?`,
+          confirmActions,
+        });
+
+        if (performAction) {
+          actionList.push({
+            action: "create",
+            path: `${projectRoot}/${args.filename}`,
+          });
+
+          createFile(`${projectRoot}/${args.filename}`, args.content);
+        }
+
+        return { success: performAction, fixToMake };
       },
       name: "createFile",
       description:
@@ -120,10 +145,63 @@ ${reference.contents}`
         },
       },
     },
+    listExsitingProjectFiles: {
+      function: async (args: {}) => {
+        let filesToCheck: string[] = [projectRoot];
+        let fileList: string[] = [];
+
+        while (filesToCheck.length > 0) {
+          const currentPath = filesToCheck.shift()!;
+
+          if (
+            currentPath.includes("node_modules") ||
+            currentPath.includes(".git") ||
+            currentPath.includes(".next")
+          ) {
+            continue;
+          }
+
+          const stats = fs.statSync(currentPath);
+
+          if (stats.isDirectory()) {
+            fs.readdirSync(currentPath).forEach((file) => {
+              filesToCheck.push(path.join(currentPath, file));
+            });
+          } else {
+            fileList.push(currentPath);
+          }
+        }
+
+        return fileList;
+      },
+      name: "listExistingProjectFiles",
+      description:
+        "Returns a list of files already present in the project directory (used to help read files you can reference and use like components).",
+      parse: (args: string) => {
+        return z.object({}).parse(JSON.parse(args));
+      },
+      parameters: {
+        type: "object",
+        properties: {},
+      },
+    },
     createDirectory: {
       function: async (args: { directoryPath: string }) => {
-        createFolder(`${projectRoot}/${args.directoryPath}`);
-        return { success: true };
+        const { performAction, fixToMake } = await confirmAction({
+          message: `Create directory '${args.directoryPath}'?`,
+          confirmActions,
+        });
+
+        if (performAction) {
+          actionList.push({
+            action: "createDir",
+            path: `${projectRoot}/${args.directoryPath}`,
+          });
+
+          createFolder(`${projectRoot}/${args.directoryPath}`);
+        }
+
+        return { success: performAction, fixToMake };
       },
       name: "createDirectory",
       description: "Create a new directory relative to the project root.",
@@ -145,4 +223,34 @@ ${reference.contents}`
       },
     },
   };
+
+  return {
+    actionList,
+    availableActions,
+  };
 };
+
+async function confirmAction(options: {
+  message: string;
+  confirmActions?: boolean;
+}) {
+  const { confirmActions, message } = options;
+
+  const yes =
+    !confirmActions ||
+    (await select({
+      message,
+      choices: [
+        { name: "Yes", value: true },
+        { name: "No", value: false },
+      ],
+    }));
+
+  if (yes) return { performAction: true };
+
+  const fixToMake = await input({
+    message: "What fix would you like the AI to make?",
+  });
+
+  return { performAction: false, fixToMake };
+}
