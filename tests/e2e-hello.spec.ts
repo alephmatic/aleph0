@@ -6,7 +6,8 @@ dotenv.config();
 
 const options: GenerateOptions = {
   projectDir: "./tests/temp",
-  regenerateDescription: true,
+  regenerateDescription: false,
+  confirmActions: true,
   technology: "next14",
   model: "gpt-4-1106-preview",
 };
