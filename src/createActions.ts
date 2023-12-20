@@ -4,7 +4,7 @@ import { RunnableFunctionWithParse } from "openai/lib/RunnableFunction";
 import consola from "consola";
 import fs from "fs";
 import path from "path";
-import { select } from "@inquirer/prompts";
+import { select, input } from "@inquirer/prompts";
 import { loadSnippets } from "./lib/utils";
 import { createFile, createFolder, readFile } from "./lib/file";
 import { ActionList, SnippetFile, Technology } from "./types";
@@ -104,17 +104,12 @@ ${reference.contents}`
     },
     createFile: {
       function: async (args: { filename: string; content: string }) => {
-        const yes =
-          !confirmActions ||
-          (await select({
-            message: `Content: ${args.content}.\n\nCreate file ${args.filename}?`,
-            choices: [
-              { name: "Yes", value: true },
-              { name: "No", value: false },
-            ],
-          }));
+        const { performAction, fixToMake } = await confirmAction({
+          message: `Content: ${args.content}\n\nCreate file ${args.filename}?`,
+          confirmActions,
+        });
 
-        if (yes) {
+        if (performAction) {
           actionList.push({
             action: "create",
             path: `${projectRoot}/${args.filename}`,
@@ -123,7 +118,7 @@ ${reference.contents}`
           createFile(`${projectRoot}/${args.filename}`, args.content);
         }
 
-        return { success: yes };
+        return { success: performAction, fixToMake };
       },
       name: "createFile",
       description:
@@ -192,17 +187,12 @@ ${reference.contents}`
     },
     createDirectory: {
       function: async (args: { directoryPath: string }) => {
-        const yes =
-          !confirmActions ||
-          (await select({
-            message: `Create directory '${args.directoryPath}'?`,
-            choices: [
-              { name: "Yes", value: true },
-              { name: "No", value: false },
-            ],
-          }));
+        const { performAction, fixToMake } = await confirmAction({
+          message: `Create directory '${args.directoryPath}'?`,
+          confirmActions,
+        });
 
-        if (yes) {
+        if (performAction) {
           actionList.push({
             action: "createDir",
             path: `${projectRoot}/${args.directoryPath}`,
@@ -211,7 +201,7 @@ ${reference.contents}`
           createFolder(`${projectRoot}/${args.directoryPath}`);
         }
 
-        return { success: yes };
+        return { success: performAction, fixToMake };
       },
       name: "createDirectory",
       description: "Create a new directory relative to the project root.",
@@ -239,3 +229,28 @@ ${reference.contents}`
     availableActions,
   };
 };
+
+async function confirmAction(options: {
+  message: string;
+  confirmActions?: boolean;
+}) {
+  const { confirmActions, message } = options;
+
+  const yes =
+    !confirmActions ||
+    (await select({
+      message,
+      choices: [
+        { name: "Yes", value: true },
+        { name: "No", value: false },
+      ],
+    }));
+
+  if (yes) return { performAction: true };
+
+  const fixToMake = await input({
+    message: "What fix would you like the AI to make?",
+  });
+
+  return { performAction: false, fixToMake };
+}
