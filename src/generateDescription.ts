@@ -14,5 +14,7 @@ export async function generateDescription(
   );
   if (!regeneratedUserPrompt) throw new Error(`AI didn't return a description`);
 
+  consola.info("Expanded user prompt:", regeneratedUserPrompt);
+
   return regeneratedUserPrompt;
 }

@@ -10,9 +10,10 @@
     "start": "node dist/index.js",
     "build": "tsup",
     "test:e2e-init": "rm -rf ./tests/temp && cp -r ./examples/next ./tests/temp && cd tests/temp/ && npm run dev",
-    "test:e2e": "PLAYWRIGHT_TEST=true playwright test"
+    "test:e2e": "DEBUG=1 PLAYWRIGHT_TEST=true playwright test"
   },
   "dependencies": {
+    "@inquirer/prompts": "^3.3.0",
     "commander": "^11.1.0",
     "consola": "^3.2.3",
     "dotenv": "^16.3.1",

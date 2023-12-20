@@ -8,6 +8,7 @@ export type GenerateOptions = {
   technology: Technology;
   regenerateDescription: boolean;
   model?: string;
+  confirmActions?: boolean;
 };
 
 export async function generate(

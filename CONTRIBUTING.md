@@ -32,8 +32,8 @@ pnpm run start
 Some test cases to try out:
 
 ```bash
-pnpm src/index.ts gen "add a form that creates a blog post" -p ./examples/next
-pnpm src/index.ts gen "create a prisma schema file with a blog model" -p ./examples/next
+npx tsx src/index.ts gen "add a form that creates a blog post" -p ./examples/next
+npx tsx src/index.ts gen "create a prisma schema file with a blog model" -p ./examples/next
 ```
 
 ## Debug
@@ -41,5 +41,5 @@ pnpm src/index.ts gen "create a prisma schema file with a blog model" -p ./examp
 You can set `CONSOLA_LEVEL=4` to see debug logs and see what the AI is doing at each step:
 
 ```bash
-CONSOLA_LEVEL=4 pnpm run src/index.ts gen "add a file named agam.ts in the app/ folder" -p ./examples/next -rd false
+CONSOLA_LEVEL=4 npx tsx src/index.ts gen "add a file named agam.ts in the app/ folder" -p ./examples/next -rd false
 ```

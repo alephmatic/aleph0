@@ -10,12 +10,14 @@ export const completeTask = async (
     technology: Technology;
     projectDir: string;
     model?: string;
+    confirmActions?: boolean;
   }
 ): Promise<ActionList> => {
   const promptString = functionCallPrompt({ userPrompt });
   const actionFactory = await createActions(
     options.technology,
-    options.projectDir
+    options.projectDir,
+    options.confirmActions,
   );
 
   const runner = openai.beta.chat.completions

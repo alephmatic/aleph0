@@ -1,16 +1,18 @@
 import { z } from "zod";
 import _ from "lodash"; // ideally just import kebabCase. but this caused a build error
 import { RunnableFunctionWithParse } from "openai/lib/RunnableFunction";
-import { loadSnippets, readMetadata } from "./lib/utils";
-import { createFile, createFolder, readFile } from "./lib/file";
-import { ActionList, SnippetFile, Technology } from "./types";
 import consola from "consola";
 import fs from "fs";
 import path from "path";
+import { select } from "@inquirer/prompts";
+import { loadSnippets } from "./lib/utils";
+import { createFile, createFolder, readFile } from "./lib/file";
+import { ActionList, SnippetFile, Technology } from "./types";
 
 export const createActions = async (
   technology: Technology,
-  projectRoot: string
+  projectRoot: string,
+  confirmActions?: boolean
 ): Promise<{
   actionList: ActionList;
   availableActions: Record<string, RunnableFunctionWithParse<any>>;
@@ -102,12 +104,26 @@ ${reference.contents}`
     },
     createFile: {
       function: async (args: { filename: string; content: string }) => {
-        actionList.push({
-          action: "create",
-          path: `${projectRoot}/${args.filename}`,
-        });
-        createFile(`${projectRoot}/${args.filename}`, args.content);
-        return { success: true };
+        const yes =
+          !confirmActions ||
+          (await select({
+            message: `Content: ${args.content}.\n\nCreate file ${args.filename}?`,
+            choices: [
+              { name: "Yes", value: true },
+              { name: "No", value: false },
+            ],
+          }));
+
+        if (yes) {
+          actionList.push({
+            action: "create",
+            path: `${projectRoot}/${args.filename}`,
+          });
+
+          createFile(`${projectRoot}/${args.filename}`, args.content);
+        }
+
+        return { success: yes };
       },
       name: "createFile",
       description:
@@ -176,12 +192,26 @@ ${reference.contents}`
     },
     createDirectory: {
       function: async (args: { directoryPath: string }) => {
-        actionList.push({
-          action: "createDir",
-          path: `${projectRoot}/${args.directoryPath}`,
-        });
-        createFolder(`${projectRoot}/${args.directoryPath}`);
-        return { success: true };
+        const yes =
+          !confirmActions ||
+          (await select({
+            message: `Create directory '${args.directoryPath}'?`,
+            choices: [
+              { name: "Yes", value: true },
+              { name: "No", value: false },
+            ],
+          }));
+
+        if (yes) {
+          actionList.push({
+            action: "createDir",
+            path: `${projectRoot}/${args.directoryPath}`,
+          });
+
+          createFolder(`${projectRoot}/${args.directoryPath}`);
+        }
+
+        return { success: yes };
       },
       name: "createDirectory",
       description: "Create a new directory relative to the project root.",
